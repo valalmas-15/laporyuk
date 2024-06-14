@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laporyuk/component/headlines.dart';
+import 'package:laporyuk/pages/emergency.dart';
 import 'package:laporyuk/pages/headlinePage.dart';
 import 'package:laporyuk/pages/menuAduan/fasilitasUmum.dart';
 import 'package:laporyuk/pages/menuAduan/pelayananKebersihan.dart';
@@ -13,16 +14,15 @@ class Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
-    return Stack(
-      children: [
-        Scaffold(
-          appBar: AppBar(
-            backgroundColor: const Color.fromRGBO(57, 167, 255, 1),
-            title: const Text('Dashboard'),
-          ),
-          drawer: const AppDrawer(),
-          body: Padding(
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromRGBO(57, 167, 255, 1),
+        title: const Text('Dashboard'),
+      ),
+      drawer: const AppDrawer(),
+      body: Stack(
+        children: [
+          Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,11 +39,12 @@ class Dashboard extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Headline(
+                    children: List.generate(
+                      3,
+                      (index) => Headline(
                         imageUrl:
                             'https://miro.medium.com/v2/resize:fit:828/format:webp/1*vgN2zojqiIYu23JPVuaSiA.jpeg',
-                        title: 'Headline',
+                        title: 'Headline ${index + 1}',
                         onTap: () {
                           Navigator.push(
                               context,
@@ -51,29 +52,7 @@ class Dashboard extends StatelessWidget {
                                   builder: (context) => HeadlinePage()));
                         },
                       ),
-                      Headline(
-                        imageUrl:
-                            'https://miro.medium.com/v2/resize:fit:828/format:webp/1*vgN2zojqiIYu23JPVuaSiA.jpeg',
-                        title: 'Headline',
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => HeadlinePage()));
-                        },
-                      ),
-                      Headline(
-                        imageUrl:
-                            'https://miro.medium.com/v2/resize:fit:828/format:webp/1*vgN2zojqiIYu23JPVuaSiA.jpeg',
-                        title: 'Headline',
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => HeadlinePage()));
-                        },
-                      ),
-                    ].map((headline) {
+                    ).map((headline) {
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: headline,
@@ -169,49 +148,72 @@ class Dashboard extends StatelessWidget {
               ],
             ),
           ),
-        ),
-        Positioned(
-          left: 0,
-          bottom: 0,
-          child: Opacity(
-            opacity: 1,
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: 50, // Tinggi sesuai kebutuhan Anda
-              decoration: BoxDecoration(
-                color: Color(0xFF39A7FF),
-                borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(20)), // Melengkungkan hanya di atas
+          Positioned(
+            left: 0,
+            bottom: 0,
+            child: Opacity(
+              opacity: 1,
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: 50, // Tinggi sesuai kebutuhan Anda
+                decoration: BoxDecoration(
+                  color: Color(0xFF39A7FF),
+                  borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20)), // Melengkungkan hanya di atas
+                ),
               ),
             ),
           ),
-        ),
-        Positioned(
-  left: 0,
-  right: 0,
-  bottom: 0,
-  child: Opacity(
-    opacity: 1,
-    child: Container(
-      width: 80,
-      height: 80,
-      decoration: BoxDecoration(
-        color: Color.fromARGB(255, 255, 57, 57),
-        shape: BoxShape.circle,
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Opacity(
+              opacity: 1,
+              child: Container(
+                width: 100,
+                height: 90,
+                decoration: BoxDecoration(
+                  color: Color(0xFF39A7FF),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: InkWell(
+              onTap: () {
+                // Navigasi ke halaman SOS saat tombol ditekan
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Emergency()));
+              },
+              child: Opacity(
+                opacity: 1,
+                child: Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(255, 255, 57, 57),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.sos_rounded, // Icon "keadaan darurat" (warning)
+                      color: Colors.white,
+                      size: 40,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
-      child: Center(
-        child: Icon(
-          Icons.sos_rounded, // Icon "keadaan darurat" (warning)
-          color: Colors.white,
-          size: 40,
-        ),
-      ),
-    ),
-  ),
-),
-
-
-      ],
     );
   }
 
@@ -238,5 +240,3 @@ class Dashboard extends StatelessWidget {
     );
   }
 }
-
-
