@@ -1,8 +1,8 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:laporyuk/component/headlines.dart';
 import 'package:laporyuk/pages/emergency.dart';
-import 'package:laporyuk/pages/headlinePage.dart';
 import 'package:laporyuk/pages/menuAduan/fasilitasUmum.dart';
 import 'package:laporyuk/pages/menuAduan/pelayananKebersihan.dart';
 import 'package:laporyuk/pages/menuAduan/pelayananKesehatan.dart';
@@ -11,6 +11,37 @@ import 'package:laporyuk/widgets/drawer.dart';
 
 class Dashboard extends StatelessWidget {
   Dashboard({Key? key}) : super(key: key);
+
+  final List<Widget> headlineSliders = [
+    Headline(
+      imageUrl: 'https://miro.medium.com/v2/resize:fit:828/format:webp/1*vgN2zojqiIYu23JPVuaSiA.jpeg',
+      title: 'Headline',
+      onTap: () {
+        // Navigasi ke halaman HeadlinePage saat headline ditekan
+        // Navigator.push(context, MaterialPageRoute(builder: (context) => HeadlinePage()));
+      },
+    ),
+    Headline(
+      imageUrl: 'https://miro.medium.com/v2/resize:fit:828/format:webp/1*vgN2zojqiIYu23JPVuaSiA.jpeg',
+      title: 'Headline',
+      onTap: () {
+        // Navigasi ke halaman HeadlinePage saat headline ditekan
+        // Navigator.push(context, MaterialPageRoute(builder: (context) => HeadlinePage()));
+      },
+    ),
+    Headline(
+      imageUrl: 'https://miro.medium.com/v2/resize:fit:828/format:webp/1*vgN2zojqiIYu23JPVuaSiA.jpeg',
+      title: 'Headline',
+      onTap: () {
+        // Navigasi ke halaman HeadlinePage saat headline ditekan
+        // Navigator.push(context, MaterialPageRoute(builder: (context) => HeadlinePage()));
+      },
+    ),
+  ];
+
+  void callbackFunction(int index, CarouselPageChangedReason reason) {
+    // Callback function implementation here
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,29 +66,23 @@ class Dashboard extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: List.generate(
-                      3,
-                      (index) => Headline(
-                        imageUrl:
-                            'https://miro.medium.com/v2/resize:fit:828/format:webp/1*vgN2zojqiIYu23JPVuaSiA.jpeg',
-                        title: 'Headline ${index + 1}',
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => HeadlinePage()));
-                        },
-                      ),
-                    ).map((headline) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: headline,
-                      );
-                    }).toList(),
+                CarouselSlider(
+                  items: headlineSliders,
+                  options: CarouselOptions(
+                    height: 180,
+                    aspectRatio: 16 / 9,
+                    viewportFraction: 0.8,
+                    initialPage: 0,
+                    enableInfiniteScroll: true,
+                    reverse: false,
+                    autoPlay: true,
+                    autoPlayInterval: const Duration(seconds: 5),
+                    autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                    autoPlayCurve: Curves.fastOutSlowIn,
+                    enlargeCenterPage: false,
+                    enlargeFactor: 0.3,
+                    onPageChanged: callbackFunction,
+                    scrollDirection: Axis.horizontal,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -156,7 +181,7 @@ class Dashboard extends StatelessWidget {
               child: Container(
                 width: MediaQuery.of(context).size.width,
                 height: 50, // Tinggi sesuai kebutuhan Anda
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Color(0xFF39A7FF),
                   borderRadius: BorderRadius.vertical(
                       top: Radius.circular(20)), // Melengkungkan hanya di atas
@@ -173,7 +198,7 @@ class Dashboard extends StatelessWidget {
               child: Container(
                 width: 100,
                 height: 90,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Color(0xFF39A7FF),
                   shape: BoxShape.circle,
                 ),
@@ -197,11 +222,11 @@ class Dashboard extends StatelessWidget {
                 child: Container(
                   width: 80,
                   height: 80,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Color.fromARGB(255, 255, 57, 57),
                     shape: BoxShape.circle,
                   ),
-                  child: Center(
+                  child: const Center(
                     child: Icon(
                       Icons.sos_rounded, // Icon "keadaan darurat" (warning)
                       color: Colors.white,
