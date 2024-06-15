@@ -17,7 +17,7 @@ class Dashboard extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(57, 167, 255, 1),
-        title: const Text('Dashboard'),
+        title: const Text('LaporYuk!'),
       ),
       drawer: const AppDrawer(),
       body: Stack(

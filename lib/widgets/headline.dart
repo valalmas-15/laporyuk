@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:laporyuk/widgets/headline.dart';
 
 class HeadlinesSection extends StatelessWidget {
   const HeadlinesSection({Key? key}) : super(key: key);

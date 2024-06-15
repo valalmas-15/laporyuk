@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:laporyuk/pages/login.dart';
+import 'package:laporyuk/pages/dashboard.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,6 +27,6 @@ class MyApp extends StatelessWidget {
         }),
         scaffoldBackgroundColor: const Color.fromRGBO(135, 196, 255, 1),
       ),
-      home:  Login());
+      home:  Dashboard());
   }
 }
