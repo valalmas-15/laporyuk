@@ -255,7 +255,7 @@ class Dashboard extends StatelessWidget {
               opacity: 1,
               child: Container(
                 width: 100,
-                height: 90,
+                height: 100,
                 decoration: const BoxDecoration(
                   color: Colors.blue,
                   shape: BoxShape.circle,
@@ -266,14 +266,14 @@ class Dashboard extends StatelessWidget {
           Positioned(
             left: 0,
             right: 0,
-            bottom: 0,
+            bottom: 4,
             child: Opacity(
               opacity: 1,
               child: Container(
                 width: 100,
                 height: 90,
                 decoration: const BoxDecoration(
-                  color: Colors.blue,
+                  color: Colors.white,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -282,7 +282,7 @@ class Dashboard extends StatelessWidget {
           Positioned(
             left: 0,
             right: 0,
-            bottom: 5,
+            bottom: 8,
             child: InkWell(
               onTap: () {
                 // Navigasi ke halaman SOS saat tombol ditekan
