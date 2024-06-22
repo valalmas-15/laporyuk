@@ -7,19 +7,19 @@ class RiwayatLaporan extends StatelessWidget {
 
   final List<Map<String, String>> listLaporan = [
     {
-      'judul': 'Laporan Banjir di Jalan Utama',
+      'judul': 'Banjir di Jalan Utama',
       'jenis': 'Banjir',
       'tanggal': '10 Juni 2024',
       'status': 'Terkirim',
     },
     {
-      'judul': 'Laporan Sampah Berserakan di Taman',
+      'judul': 'Sampah Berserakan di Taman',
       'jenis': 'Kebersihan',
       'tanggal': '12 Juni 2024',
       'status': 'Proses',
     },
     {
-      'judul': 'Laporan Gangguan pada Jaringan Listrik',
+      'judul': 'Gangguan pada Jaringan Listrik',
       'jenis': 'Listrik',
       'tanggal': '15 Juni 2024',
       'status': 'Selesai',

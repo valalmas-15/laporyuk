@@ -6,7 +6,6 @@ import 'package:laporyuk/component/judulLaporan.dart';
 import 'package:location/location.dart' as location;
 
 import 'package:laporyuk/component/datePicker.dart';
-import 'package:laporyuk/component/locationPicker.dart';
 import 'package:laporyuk/component/imgPicker.dart';
 import 'package:laporyuk/component/dropDown.dart';
 
@@ -59,7 +58,7 @@ class _PelayananPublikPageState extends State<PelayananPublik> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pelayanan Publik'),
+        title: const Text('Pengaduan Pelayanan Publik'),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -82,17 +81,6 @@ class _PelayananPublikPageState extends State<PelayananPublik> {
             DatePickerWidget(controller: _dateController),
 
             // lokasi laporan
-            DescriptionTextField(controller: _alamatController, hintText: 'Alamat Kejadian'),
-            LocationPickerWidget(
-              locationService: _locationService,
-              onLocationSelected: (location.LocationData locationData) {
-                setState(() {
-                  _locationData = locationData;
-                });
-              },
-            ),
-
-            // Dropdown layanan publik terkait
             DropdownWidget(
               items: _dropdownItems,
               onChanged: (value) {
@@ -101,6 +89,10 @@ class _PelayananPublikPageState extends State<PelayananPublik> {
                 });
               },
             ),
+            DescriptionTextField(controller: _alamatController, hintText: 'Alamat Kejadian'),
+
+            // Dropdown layanan publik terkait
+            
 
             // bukti laporan
             ImagePickerWidget(
@@ -110,6 +102,8 @@ class _PelayananPublikPageState extends State<PelayananPublik> {
                 });
               },
             ),
+
+            SizedBox(height: 60,),
 
             // tombol submit
             Padding(

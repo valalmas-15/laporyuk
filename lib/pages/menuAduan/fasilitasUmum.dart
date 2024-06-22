@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:laporyuk/component/descTxt.dart';
+import 'package:laporyuk/component/dropDown.dart';
 import 'package:laporyuk/component/judulLaporan.dart';
 import 'package:location/location.dart' as location;
 
@@ -23,6 +24,8 @@ class _FasilitasUmum extends State<FasilitasUmum> {
   TextEditingController _alamatController = TextEditingController();
   File? _pickedImage;
   location.LocationData? _locationData;
+  List<String> _dropdownItems = ['Layanan Medis 1', 'Layanan Medis 2', 'Layanan Medis 3'];
+  String? _selectedDropdownItem;
 
 
   @override
@@ -56,7 +59,7 @@ class _FasilitasUmum extends State<FasilitasUmum> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pelayanan Fasilitas Umum'),
+        title: const Text('Pengaduan Fasilitas Umum'),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -79,15 +82,16 @@ class _FasilitasUmum extends State<FasilitasUmum> {
             DatePickerWidget(controller: _dateController),
 
             // lokasi laporan
-            DescriptionTextField(controller: _alamatController, hintText: 'Alamat Kejadian'),
-            LocationPickerWidget(
-              locationService: _locationService,
-              onLocationSelected: (location.LocationData locationData) {
+            DropdownWidget(
+              items: _dropdownItems,
+              onChanged: (value) {
                 setState(() {
-                  _locationData = locationData;
+                  _selectedDropdownItem = value;
                 });
               },
             ),
+            DescriptionTextField(controller: _alamatController, hintText: 'Alamat Lengkap Kejadian'),
+
 
             // bukti laporan
             ImagePickerWidget(
@@ -97,6 +101,8 @@ class _FasilitasUmum extends State<FasilitasUmum> {
                 });
               },
             ),
+
+            SizedBox(height: 60,),
 
             // tombol submit
             Padding(
@@ -114,6 +120,7 @@ class _FasilitasUmum extends State<FasilitasUmum> {
       ),
     );
   }
+
 
   void _submitForm() {
     // Implement logic to submit the form data

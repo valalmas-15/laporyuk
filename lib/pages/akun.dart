@@ -8,6 +8,7 @@ class Akun extends StatelessWidget {
   // Controllers for the text fields
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _userNameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +28,14 @@ class Akun extends StatelessWidget {
               hintText: 'Nama',
             ),
             AccTextField(
+              controller: _userNameController,
+              hintText: 'Username',
+            ),
+            AccTextField(
               controller: _phoneNumberController,
               hintText: 'Nomor Telepon',
             ),
+
             ElevatedButton(
               onPressed: () {
                 // Handle save button pressed

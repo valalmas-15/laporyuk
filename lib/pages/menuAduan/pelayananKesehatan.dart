@@ -6,7 +6,6 @@ import 'package:laporyuk/component/judulLaporan.dart';
 import 'package:location/location.dart' as location;
 
 import 'package:laporyuk/component/datePicker.dart';
-import 'package:laporyuk/component/locationPicker.dart';
 import 'package:laporyuk/component/imgPicker.dart';
 import 'package:laporyuk/component/dropDown.dart';
 
@@ -59,7 +58,7 @@ class _PelayananKesehatanPageState extends State<PelayananKesehatan> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pelayanan Kesehatan'),
+        title: const Text('Pengaduan Pelayanan Kesehatan'),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -82,17 +81,6 @@ class _PelayananKesehatanPageState extends State<PelayananKesehatan> {
             DatePickerWidget(controller: _dateController),
 
             // lokasi laporan
-            DescriptionTextField(controller: _alamatController, hintText: 'Alamat Kejadin'),
-            LocationPickerWidget(
-              locationService: _locationService,
-              onLocationSelected: (location.LocationData locationData) {
-                setState(() {
-                  _locationData = locationData;
-                });
-              },
-            ),
-
-            // Dropdown layanan medis terkait
             DropdownWidget(
               items: _dropdownItems,
               onChanged: (value) {
@@ -101,6 +89,8 @@ class _PelayananKesehatanPageState extends State<PelayananKesehatan> {
                 });
               },
             ),
+            DescriptionTextField(controller: _alamatController, hintText: 'Alamat Lengkap Kejadian'),
+
 
             // bukti laporan
             ImagePickerWidget(
@@ -110,6 +100,8 @@ class _PelayananKesehatanPageState extends State<PelayananKesehatan> {
                 });
               },
             ),
+
+            SizedBox(height: 60,),
 
             // tombol submit
             Padding(

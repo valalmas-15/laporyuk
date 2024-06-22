@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:laporyuk/component/descTxt.dart';
+import 'package:laporyuk/component/dropDown.dart';
 import 'package:laporyuk/component/judulLaporan.dart';
 import 'package:location/location.dart' as location;
 
 import 'package:laporyuk/component/datePicker.dart';
-import 'package:laporyuk/component/locationPicker.dart';
 import 'package:laporyuk/component/imgPicker.dart';
 
 class PelayananKebersihan extends StatefulWidget {
@@ -23,6 +23,8 @@ class _PelayananKebersihan extends State<PelayananKebersihan> {
   TextEditingController _alamatController = TextEditingController();
   File? _pickedImage;
   location.LocationData? _locationData;
+  List<String> _dropdownItems = ['Layanan Medis 1', 'Layanan Medis 2', 'Layanan Medis 3'];
+  String? _selectedDropdownItem;
 
   @override
   void initState() {
@@ -55,7 +57,7 @@ class _PelayananKebersihan extends State<PelayananKebersihan> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pelayanan Kebersihan'),
+        title: const Text('Pengaduan Pelayanan Kebersihan'),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -78,15 +80,15 @@ class _PelayananKebersihan extends State<PelayananKebersihan> {
             DatePickerWidget(controller: _dateController),
 
             // lokasi laporan
-            DescriptionTextField(controller: _alamatController, hintText: 'Alamat Kejadian'),
-            LocationPickerWidget(
-              locationService: _locationService,
-              onLocationSelected: (location.LocationData locationData) {
+            DropdownWidget(
+              items: _dropdownItems,
+              onChanged: (value) {
                 setState(() {
-                  _locationData = locationData;
+                  _selectedDropdownItem = value;
                 });
               },
             ),
+            DescriptionTextField(controller: _alamatController, hintText: 'Alamat Kejadian'),
 
             // bukti laporan
             ImagePickerWidget(
@@ -96,6 +98,8 @@ class _PelayananKebersihan extends State<PelayananKebersihan> {
                 });
               },
             ),
+
+            SizedBox(height: 60,),
 
             // tombol submit
             Padding(

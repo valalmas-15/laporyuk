@@ -8,6 +8,9 @@ import 'package:laporyuk/pages/menuAduan/pelayananKebersihan.dart';
 import 'package:laporyuk/pages/menuAduan/pelayananKesehatan.dart';
 import 'package:laporyuk/pages/menuAduan/pelayananPublik.dart';
 import 'package:laporyuk/widgets/drawer.dart';
+import 'package:laporyuk/widgets/laporan.dart';
+import 'package:laporyuk/widgets/menu_aduan.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class Dashboard extends StatelessWidget {
   Dashboard({Key? key}) : super(key: key);
@@ -30,6 +33,35 @@ class Dashboard extends StatelessWidget {
     ),
   ];
 
+  final List<Map<String, String>> listLaporan = [
+    {
+      'judul': 'Banjir di Jalan Utama',
+      'jenis': 'Banjir',
+      'tanggal': '10 Juni 2024',
+      'status': 'Selesai',
+    },
+    {
+      'judul': 'Sampah Berserakan di Taman',
+      'jenis': 'Kebersihan',
+      'tanggal': '12 Juni 2024',
+      'status': 'Selesai',
+    },
+    {
+      'judul': 'Gangguan pada Jaringan Listrik',
+      'jenis': 'Listrik',
+      'tanggal': '15 Juni 2024',
+      'status': 'Selesai',
+    },
+  ];
+
+  final ItemScrollController itemScrollController = ItemScrollController();
+  final ScrollOffsetController scrollOffsetController =
+      ScrollOffsetController();
+  final ItemPositionsListener itemPositionsListener =
+      ItemPositionsListener.create();
+  final ScrollOffsetListener scrollOffsetListener =
+      ScrollOffsetListener.create();
+
   void callbackFunction(int index, CarouselPageChangedReason reason) {
     // Callback function implementation here
   }
@@ -49,21 +81,13 @@ class Dashboard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text(
-                  'Dashboard',
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontSize: 35,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
                 CarouselSlider(
                   items: headlineSliders
                       .map((item) => Container(
                             width: MediaQuery.of(context).size.width,
                             margin: EdgeInsets.symmetric(horizontal: 5.0),
                             child: Card(
-                            color: Colors.blue,
+                              color: Colors.blue,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
@@ -105,82 +129,105 @@ class Dashboard extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                Expanded(
-                  child: Container(
-                    margin: const EdgeInsets.only(top: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: GridView.count(
-                      crossAxisCount: 2,
-                      padding: const EdgeInsets.all(20),
-                      mainAxisSpacing: 10.0,
-                      crossAxisSpacing: 10.0,
-                      children: [
-                        _buildMenuAduanItem(
-                          icon: Icons.house_siding_rounded,
-                          title: 'Fasilitas Umum',
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => FasilitasUmum()));
-                          },
-                        ),
-                        _buildMenuAduanItem(
-                          icon: Icons.cleaning_services_rounded,
-                          title: 'Pelayanan Kebersihan',
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        PelayananKebersihan()));
-                          },
-                        ),
-                        _buildMenuAduanItem(
-                          icon: Icons.public,
-                          title: 'Pelayanan Publik',
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => PelayananPublik()));
-                          },
-                        ),
-                        _buildMenuAduanItem(
-                          icon: Icons.health_and_safety_rounded,
-                          title: 'Pelayanan Kesehatan',
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        PelayananKesehatan()));
-                          },
-                        ),
-                      ],
-                    ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      MenuAduan(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FasilitasUmum(),
+                            ),
+                          );
+                        },
+                        icon: Icons.house_outlined,
+                        title: 'Fasilitas\nUmum',
+                        color: Colors.blue,
+                      ),
+                      MenuAduan(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PelayananPublik(),
+                            ),
+                          );
+                        },
+                        icon: Icons.menu_book_outlined,
+                        title: 'Pelayanan\nPublik',
+                        color: Colors.blue,
+                      ),
+                      MenuAduan(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PelayananKesehatan(),
+                            ),
+                          );
+                        },
+                        icon: Icons.health_and_safety_outlined,
+                        title: 'Pelayanan\nKesehatan',
+                        color: Colors.blue,
+                      ),
+                      MenuAduan(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PelayananKebersihan(),
+                            ),
+                          );
+                        },
+                        icon: Icons.cleaning_services_outlined,
+                        title: 'Pelayanan\nKebersihan',
+                        color: Colors.blue,
+                      ),
+                    ],
                   ),
                 ),
+                const SizedBox(height: 16),
                 Container(
-                  margin: const EdgeInsets.only(top: 20),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    gradient: const LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Color(0xff87c4ff),
-                        Color(0xff6498af),
-                      ],
-                      stops: [0.485, 1],
+                  height: 360, // Adjust this height as needed
+                  child: Card(
+                    color: Colors.white, // Set the background color of the Card
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Laporan Selesai',
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: listLaporan.length,
+                              itemBuilder: (context, index) {
+                                return LaporanCard(
+                                  judul: listLaporan[index]['judul']!,
+                                  jenis: listLaporan[index]['jenis']!,
+                                  tanggal: listLaporan[index]['tanggal']!,
+                                  status: listLaporan[index]['status']!,
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  child: const Center(),
-                ),
+                )
               ],
             ),
           ),
@@ -193,7 +240,7 @@ class Dashboard extends StatelessWidget {
                 width: MediaQuery.of(context).size.width,
                 height: 50, // Tinggi sesuai kebutuhan Anda
                 decoration: const BoxDecoration(
-                  color: Color(0xFF39A7FF),
+                  color: Colors.blue,
                   borderRadius: BorderRadius.vertical(
                       top: Radius.circular(20)), // Melengkungkan hanya di atas
                 ),
@@ -210,7 +257,7 @@ class Dashboard extends StatelessWidget {
                 width: 100,
                 height: 90,
                 decoration: const BoxDecoration(
-                  color: Color(0xFF39A7FF),
+                  color: Colors.blue,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -220,6 +267,22 @@ class Dashboard extends StatelessWidget {
             left: 0,
             right: 0,
             bottom: 0,
+            child: Opacity(
+              opacity: 1,
+              child: Container(
+                width: 100,
+                height: 90,
+                decoration: const BoxDecoration(
+                  color: Colors.blue,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 5,
             child: InkWell(
               onTap: () {
                 // Navigasi ke halaman SOS saat tombol ditekan
@@ -247,28 +310,6 @@ class Dashboard extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildMenuAduanItem(
-      {required IconData icon,
-      required String title,
-      required VoidCallback onTap}) {
-    return InkWell(
-      onTap: onTap,
-      child: Card(
-        color: const Color.fromRGBO(57, 167, 255, 1),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 50.0, color: Colors.white),
-            Text(
-              title,
-              style: const TextStyle(fontSize: 10.0, color: Colors.white),
-            ),
-          ],
-        ),
       ),
     );
   }
