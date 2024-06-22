@@ -52,7 +52,6 @@ class _FasilitasUmum extends State<FasilitasUmum> {
     }
 
     _locationData = await _locationService.getLocation();
-    setState(() {}); // Refresh UI after getting location
   }
 
   @override
