@@ -14,28 +14,19 @@ class Dashboard extends StatelessWidget {
 
   final List<Widget> headlineSliders = [
     Headline(
-      imageUrl: 'https://miro.medium.com/v2/resize:fit:828/format:webp/1*vgN2zojqiIYu23JPVuaSiA.jpeg',
+      imageUrl:
+          'https://miro.medium.com/v2/resize:fit:828/format:webp/1*vgN2zojqiIYu23JPVuaSiA.jpeg',
       title: 'Headline',
-      onTap: () {
-        // Navigasi ke halaman HeadlinePage saat headline ditekan
-        // Navigator.push(context, MaterialPageRoute(builder: (context) => HeadlinePage()));
-      },
     ),
     Headline(
-      imageUrl: 'https://miro.medium.com/v2/resize:fit:828/format:webp/1*vgN2zojqiIYu23JPVuaSiA.jpeg',
+      imageUrl:
+          'https://miro.medium.com/v2/resize:fit:828/format:webp/1*vgN2zojqiIYu23JPVuaSiA.jpeg',
       title: 'Headline',
-      onTap: () {
-        // Navigasi ke halaman HeadlinePage saat headline ditekan
-        // Navigator.push(context, MaterialPageRoute(builder: (context) => HeadlinePage()));
-      },
     ),
     Headline(
-      imageUrl: 'https://miro.medium.com/v2/resize:fit:828/format:webp/1*vgN2zojqiIYu23JPVuaSiA.jpeg',
+      imageUrl:
+          'https://miro.medium.com/v2/resize:fit:828/format:webp/1*vgN2zojqiIYu23JPVuaSiA.jpeg',
       title: 'Headline',
-      onTap: () {
-        // Navigasi ke halaman HeadlinePage saat headline ditekan
-        // Navigator.push(context, MaterialPageRoute(builder: (context) => HeadlinePage()));
-      },
     ),
   ];
 
@@ -47,7 +38,7 @@ class Dashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(57, 167, 255, 1),
+        backgroundColor: Color.fromARGB(255, 255, 255, 255),
         title: const Text('LaporYuk!'),
       ),
       drawer: const AppDrawer(),
@@ -67,17 +58,37 @@ class Dashboard extends StatelessWidget {
                   ),
                 ),
                 CarouselSlider(
-                  items: headlineSliders,
+                  items: headlineSliders
+                      .map((item) => Container(
+                            width: MediaQuery.of(context).size.width,
+                            margin: EdgeInsets.symmetric(horizontal: 5.0),
+                            child: Card(
+                            color: Colors.blue,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: ClipRRect(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(10.0)),
+                                child: item,
+                              ),
+                            ),
+                          ))
+                      .toList(),
                   options: CarouselOptions(
                     height: 180,
-                    aspectRatio: 16 / 9,
-                    viewportFraction: 0.8,
+                    aspectRatio: MediaQuery.of(context).size.width /
+                        180, // Menyesuaikan aspect ratio agar lebar penuh
+                    viewportFraction:
+                        1.0, // Mengatur agar item memenuhi viewport
                     initialPage: 0,
                     enableInfiniteScroll: true,
                     reverse: false,
                     autoPlay: true,
                     autoPlayInterval: const Duration(seconds: 5),
-                    autoPlayAnimationDuration: const Duration(milliseconds: 800),
+                    autoPlayAnimationDuration:
+                        const Duration(milliseconds: 800),
                     autoPlayCurve: Curves.fastOutSlowIn,
                     enlargeCenterPage: false,
                     enlargeFactor: 0.3,
@@ -212,10 +223,8 @@ class Dashboard extends StatelessWidget {
             child: InkWell(
               onTap: () {
                 // Navigasi ke halaman SOS saat tombol ditekan
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => Emergency()));
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => Emergency()));
               },
               child: Opacity(
                 opacity: 1,
@@ -253,11 +262,10 @@ class Dashboard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 100.0, color: Colors.white),
-            const SizedBox(height: 10.0),
+            Icon(icon, size: 50.0, color: Colors.white),
             Text(
               title,
-              style: const TextStyle(fontSize: 15.0, color: Colors.white),
+              style: const TextStyle(fontSize: 10.0, color: Colors.white),
             ),
           ],
         ),

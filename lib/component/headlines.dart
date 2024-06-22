@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:laporyuk/pages/headlinePage.dart';
 
 class Headline extends StatelessWidget {
   final String imageUrl;
   final String title;
-  final VoidCallback onTap;
 
   const Headline({
     Key? key,
     required this.imageUrl,
     required this.title,
-    required this.onTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => HeadlinePage()));
+      },
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),

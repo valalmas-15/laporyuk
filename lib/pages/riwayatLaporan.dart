@@ -30,7 +30,7 @@ class RiwayatLaporan extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(57, 167, 255, 1),
+        backgroundColor: Color.fromARGB(255, 255, 255, 255),
         title: const Text('Riwayat Laporan'),
       ),
       drawer: const AppDrawer(), // Gunakan widget drawer yang sudah dibuat

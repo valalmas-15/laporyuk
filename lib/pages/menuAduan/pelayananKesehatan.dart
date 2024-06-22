@@ -21,6 +21,7 @@ class _PelayananKesehatanPageState extends State<PelayananKesehatan> {
   TextEditingController _dateController = TextEditingController();
   TextEditingController _judulController = TextEditingController();
   TextEditingController _deskripsiController = TextEditingController();
+  TextEditingController _alamatController = TextEditingController();
   File? _pickedImage;
   location.LocationData? _locationData;
 
@@ -81,6 +82,7 @@ class _PelayananKesehatanPageState extends State<PelayananKesehatan> {
             DatePickerWidget(controller: _dateController),
 
             // lokasi laporan
+            DescriptionTextField(controller: _alamatController, hintText: 'Alamat Kejadin'),
             LocationPickerWidget(
               locationService: _locationService,
               onLocationSelected: (location.LocationData locationData) {

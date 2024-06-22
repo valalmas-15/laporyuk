@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
           800: Color(0xFF1565C0),
           900: Color(0xFF0D47A1),
         }),
-        scaffoldBackgroundColor: const Color.fromRGBO(135, 196, 255, 1),
+        scaffoldBackgroundColor: Color.fromARGB(255, 255, 255, 255),
       ),
       home:  Dashboard());
   }
