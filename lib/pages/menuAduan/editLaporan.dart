@@ -31,6 +31,10 @@ class _EditLaporanState extends State<EditLaporan> {
     'Pelayanan Kesehatan',
     'Pelayanan Kebersihan'
   ];
+  String? _judulAduan;
+  String? _deskripsiAduan;
+  String? _alamatAduan;
+  String? _tanggal;
 
   @override
   void initState() {
@@ -40,32 +44,52 @@ class _EditLaporanState extends State<EditLaporan> {
   }
 
   Future<void> _fetchLaporanData() async {
-    final apiUrl = ApiUrl.apiUrl + 'detail_laporan.php?id=${widget.idAduan}';
+  final apiUrl = ApiUrl.apiUrl + 'detail_laporan.php?id=${widget.idAduan}';
 
-    try {
-      final response = await http.get(Uri.parse(apiUrl));
+  try {
+    final response = await http.get(Uri.parse(apiUrl));
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        setState(() {
-          _judulController.text = data['judul'] ?? '';
-          _deskripsiController.text = data['deskripsi'] ?? '';
-          _alamatController.text = data['alamat'] ?? '';
-          _dateController.text = data['tanggal'] ?? '';
-          _selectedKecamatan = data['kecamatan'] ?? null;
-          _selectedJenis = data['jenis'] ?? null;
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load laporan data')),
-        );
-      }
-    } catch (e) {
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      setState(() {
+        _judulController.text = data['judul_aduan'] ?? '';
+        _deskripsiController.text = data['deskripsi_aduan'] ?? '';
+        _alamatController.text = data['alamat_aduan'] ?? '';
+        _dateController.text = data['tanggal'] ?? '';
+
+        // Initialize _selectedKecamatan and _selectedJenis with existing values
+        _selectedKecamatan = data['kecamatan'];
+        _selectedJenis = data['jenis_aduan'];
+
+        // If _selectedKecamatan is null or not found in _kecamatanList, default to the first item
+        if (_selectedKecamatan == null || !_kecamatanList.contains(_selectedKecamatan)) {
+          _selectedKecamatan = _kecamatanList.isNotEmpty ? _kecamatanList.first : null;
+        }
+
+        // If _selectedJenis is null or not found in _jenisList, default to the first item
+        if (_selectedJenis == null || !_jenisList.contains(_selectedJenis)) {
+          _selectedJenis = _jenisList.isNotEmpty ? _jenisList.first : null;
+        }
+
+        // Ensure these variables are also updated for displaying hints
+        _judulAduan = data['judul_aduan'];
+        _deskripsiAduan = data['deskripsi_aduan'];
+        _alamatAduan = data['alamat_aduan'];
+        _tanggal = data['tanggal'];
+      });
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error occurred: $e')),
+        SnackBar(content: Text('Failed to load laporan data')),
       );
     }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error occurred: $e')),
+    );
   }
+}
+
+
 
   Future<void> _fetchKecamatanData() async {
     final apiUrl = ApiUrl.apiUrl + 'kecamatan.php';
@@ -90,7 +114,6 @@ class _EditLaporanState extends State<EditLaporan> {
       );
     }
   }
-  
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +126,6 @@ class _EditLaporanState extends State<EditLaporan> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Judul Laporan
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Card(
@@ -115,7 +137,7 @@ class _EditLaporanState extends State<EditLaporan> {
                       child: TextFormField(
                         controller: _judulController,
                         decoration: InputDecoration(
-                          labelText: ,
+                          hintText: _judulAduan,
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -126,7 +148,7 @@ class _EditLaporanState extends State<EditLaporan> {
                         controller: _deskripsiController,
                         maxLines: 3,
                         decoration: InputDecoration(
-                          labelText: 'Deskripsi Laporan',
+                          hintText: _deskripsiAduan,
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -142,7 +164,7 @@ class _EditLaporanState extends State<EditLaporan> {
                       child: TextFormField(
                         controller: _alamatController,
                         decoration: InputDecoration(
-                          labelText: 'Alamat Lengkap Kejadian',
+                          hintText: _alamatAduan,
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -168,6 +190,7 @@ class _EditLaporanState extends State<EditLaporan> {
                         ),
                       ),
                     ),
+                    
                     ImagePickerWidget(
                       onImageSelected: (File pickedImage) {
                         setState(() {
@@ -251,7 +274,6 @@ class _EditLaporanState extends State<EditLaporan> {
     final idKecamatan = kecamatanMap[_selectedKecamatan] ?? '';
     final idJenis = jenisMap[_selectedJenis] ?? '';
 
-    // Log the selected values
     print('Judul Laporan: ${_judulController.text}');
     print('Deskripsi Laporan: ${_deskripsiController.text}');
     print('Alamat Lengkap Kejadian: ${_alamatController.text}');
@@ -261,7 +283,6 @@ class _EditLaporanState extends State<EditLaporan> {
       print('Bukti Laporan: ${_pickedImage!.path}');
     }
 
-    // Prepare data to be sent
     final data = {
       'judul': _judulController.text,
       'deskripsi': _deskripsiController.text,
@@ -274,9 +295,7 @@ class _EditLaporanState extends State<EditLaporan> {
           : '',
     };
 
-    // Send data to API
-    final apiUrl =
-        '${ApiUrl.apiUrl}update_laporan.php'; // Replace with your update API URL
+    final apiUrl = '${ApiUrl.apiUrl}update_laporan.php';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
