@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:laporyuk/component/acc_textfield.dart';
+import 'package:laporyuk/component/loginReg/acc_textfield.dart';
 import 'package:laporyuk/component/textbutton.dart';
 import 'package:laporyuk/pages/login.dart';
 
