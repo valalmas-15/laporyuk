@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:laporyuk/component/headlines.dart';
+import 'package:laporyuk/component/url.dart';
 import 'package:laporyuk/pages/emergency.dart';
 import 'package:laporyuk/pages/menuAduan/fasilitasUmum.dart';
 import 'package:laporyuk/pages/menuAduan/pelayananKebersihan.dart';
@@ -12,9 +16,15 @@ import 'package:laporyuk/widgets/laporan.dart';
 import 'package:laporyuk/widgets/menu_aduan.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-class Dashboard extends StatelessWidget {
+
+class Dashboard extends StatefulWidget {
   Dashboard({Key? key}) : super(key: key);
 
+  @override
+  _DashboardState createState() => _DashboardState();
+}
+
+class _DashboardState extends State<Dashboard> {
   final List<Widget> headlineSliders = [
     Headline(
       imageUrl:
@@ -33,34 +43,48 @@ class Dashboard extends StatelessWidget {
     ),
   ];
 
-  final List<Map<String, String>> listLaporan = [
-    {
-      'judul': 'Banjir di Jalan Utama',
-      'jenis': 'Banjir',
-      'tanggal': '10 Juni 2024',
-      'status': 'Selesai',
-    },
-    {
-      'judul': 'Sampah Berserakan di Taman',
-      'jenis': 'Kebersihan',
-      'tanggal': '12 Juni 2024',
-      'status': 'Selesai',
-    },
-    {
-      'judul': 'Gangguan pada Jaringan Listrik',
-      'jenis': 'Listrik',
-      'tanggal': '15 Juni 2024',
-      'status': 'Selesai',
-    },
-  ];
+  late Future<List<Map<String, dynamic>>> riwayatLaporan;
+
+  @override
+  void initState() {
+    super.initState();
+    riwayatLaporan = fetchRiwayatLaporan();
+  }
+
+  Future<List<Map<String, dynamic>>> fetchRiwayatLaporan() async {
+    final Uri url = Uri.parse(
+        ApiUrl.baseUrl + 'Dashboardlaporan.php');
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        List<Map<String, dynamic>> riwayatLaporan = data
+            .map((e) {
+              return {
+                'id': e['idAduan'],
+                'judul': e['judul_aduan'],
+                'jenis': e['jenis_aduan'],
+                'tanggal': e['tanggal'],
+                'status': e['status_aduan'],
+              };
+            })
+            .toList();
+
+        return riwayatLaporan;
+      } else {
+        throw Exception('Failed to load riwayat laporan: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching riwayat laporan: $e');
+      throw Exception('Error: $e');
+    }
+  }
 
   final ItemScrollController itemScrollController = ItemScrollController();
-  final ScrollOffsetController scrollOffsetController =
-      ScrollOffsetController();
   final ItemPositionsListener itemPositionsListener =
       ItemPositionsListener.create();
-  final ScrollOffsetListener scrollOffsetListener =
-      ScrollOffsetListener.create();
 
   void callbackFunction(int index, CarouselPageChangedReason reason) {
     // Callback function implementation here
@@ -211,15 +235,52 @@ class Dashboard extends StatelessWidget {
                             ),
                           ),
                           Expanded(
-                            child: ListView.builder(
-                              itemCount: listLaporan.length,
-                              itemBuilder: (context, index) {
-                                return LaporanCard(
-                                  judul: listLaporan[index]['judul']!,
-                                  jenis: listLaporan[index]['jenis']!,
-                                  tanggal: listLaporan[index]['tanggal']!,
-                                  status: listLaporan[index]['status']!,
-                                );
+                            child: FutureBuilder<List<Map<String, dynamic>>>(
+                              future: riwayatLaporan,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                } else if (snapshot.hasData &&
+                                    snapshot.data!.isNotEmpty) {
+                                  return ScrollablePositionedList.builder(
+                                    itemCount: snapshot.data!.length,
+                                    itemBuilder: (context, index) {
+                                      return LaporanCard(
+                                        id: int.parse(
+                                            snapshot.data![index]['id']),
+                                        judul: snapshot.data![index]
+                                            ['judul']!,
+                                        jenis: snapshot.data![index]
+                                            ['jenis']!,
+                                        tanggal: snapshot.data![index]
+                                            ['tanggal']!,
+                                        status: snapshot.data![index]
+                                            ['status']!,
+                                      );
+                                    },
+                                    itemScrollController: itemScrollController,
+                                    itemPositionsListener:
+                                        itemPositionsListener,
+                                    scrollDirection: Axis.vertical,
+                                  );
+                                } else if (snapshot.hasError) {
+                                  return Center(
+                                    child: Text('Error: ${snapshot.error}'),
+                                  );
+                                } else {
+                                  return Center(
+                                    child: Text(
+                                      'Belum ada laporan yang selesai',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  );
+                                }
                               },
                             ),
                           ),

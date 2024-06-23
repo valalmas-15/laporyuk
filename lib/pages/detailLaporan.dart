@@ -1,61 +1,36 @@
-import 'dart:io';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:laporyuk/component/datePicker.dart';
-import 'package:laporyuk/component/descTxt.dart';
-import 'package:laporyuk/component/dropDown.dart';
-import 'package:laporyuk/component/imgPicker.dart';
-import 'package:laporyuk/component/judulLaporan.dart';
+import 'package:http/http.dart' as http;
+import 'package:laporyuk/component/url.dart';
+import 'package:laporyuk/pages/menuAduan/editLaporan.dart';
 
 class DetailLaporan extends StatefulWidget {
+  final int idAduan;
+
+  const DetailLaporan({Key? key, required this.idAduan}) : super(key: key);
+
   @override
-  DetailLaporanPage createState() => DetailLaporanPage();
-
-  final String judul;
-  final String jenis;
-  final String tanggal;
-  final String status;
-  final String deskripsi;
-
-  DetailLaporan({
-    required this.judul,
-    required this.jenis,
-    required this.tanggal,
-    required this.status,
-    required this.deskripsi,
-  });
+  _DetailLaporanState createState() => _DetailLaporanState();
 }
 
-class DetailLaporanPage extends State<DetailLaporan> {
-  TextEditingController _dateController = TextEditingController();
-  TextEditingController _judulController = TextEditingController();
-  TextEditingController _deskripsiController = TextEditingController();
-  TextEditingController _alamatController = TextEditingController();
-  File? _pickedImage;
-  List<String> _dropdownItems = ['Layanan Medis 1', 'Layanan Medis 2', 'Layanan Medis 3'];
-  String? _selectedDropdownItem;
-  bool _showSubmitButton = true; // Flag to control submit button visibility
+class _DetailLaporanState extends State<DetailLaporan> {
+  late Future<Map<String, dynamic>> futureDetailLaporan;
 
   @override
   void initState() {
     super.initState();
-    _judulController.text = widget.judul;
-    _dateController.text = widget.tanggal;
-    _deskripsiController.text = widget.deskripsi;
-    // Initialize other controllers as needed
-    _checkStatus(); // Check initial status
+    futureDetailLaporan = fetchDetailLaporan(widget.idAduan);
   }
 
-  void _checkStatus() {
-    // Check if status is "Selesai", then hide the submit button
-    if (widget.status == 'Selesai') {
-      setState(() {
-        _showSubmitButton = false;
-      });
+  Future<Map<String, dynamic>> fetchDetailLaporan(int idAduan) async {
+    final response = await http.get(
+      Uri.parse(ApiUrl.baseUrl+'detail_laporan.php?id=$idAduan'),
+    );
+    if (response.statusCode == 200) {
+      Map<String, dynamic> detailLaporan = jsonDecode(response.body);
+      return detailLaporan;
     } else {
-      setState(() {
-        _showSubmitButton = true;
-      });
+      throw Exception('Failed to load detail laporan');
     }
   }
 
@@ -63,94 +38,116 @@ class DetailLaporanPage extends State<DetailLaporan> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detail Laporan'),
+        title: Text('Detail Laporan'),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Judul laporan
-            JudulLaporan(
-              controller: _judulController,
-              hintText: 'Judul Laporan',
-            ),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: futureDetailLaporan,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (snapshot.hasData) {
+            Map<String, dynamic> detailLaporan = snapshot.data!;
+            bool allowEdit = detailLaporan['status_aduan'] == '1';
 
-            // Deskripsi laporan
-            DescriptionTextField(
-              controller: _deskripsiController,
-              hintText: 'Deskripsi Laporan',
-              prefixIcon: Icons.description,
-            ),
-
-            // Tanggal laporan
-            DatePickerWidget(controller: _dateController),
-
-            // Dropdown untuk layanan medis
-            DropdownWidget(
-              items: _dropdownItems,
-              onChanged: (value) {
-                setState(() {
-                  _selectedDropdownItem = value;
-                });
-              },
-            ),
-
-            // Alamat kejadian
-            DescriptionTextField(controller: _alamatController, hintText: 'Alamat Kejadian'),
-
-            // Bukti laporan
-            ImagePickerWidget(
-              onImageSelected: (File pickedImage) {
-                setState(() {
-                  _pickedImage = pickedImage;
-                });
-              },
-            ),
-
-            SizedBox(height: 60),
-
-            // Tombol submit (ditampilkan hanya jika status tidak "Selesai")
-            if (_showSubmitButton)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    _submitForm();
-                  },
-                  child: Text('Kirim Laporan'),
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              detailLaporan['judul_aduan'],
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Jenis: ${getJenisText(detailLaporan['jenis_aduan'])}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Tanggal: ${detailLaporan['tanggal']}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Status: ${getStatusText(detailLaporan['status_aduan'])}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Deskripsi: ${detailLaporan['deskripsi_aduan']}',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            if (allowEdit)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 16.0),
+                                child: Center(
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => EditLaporan(idAduan: widget.idAduan),
+                                        ),
+                                      );
+                                    },
+                                    child: Text('Edit Laporan'),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-          ],
-        ),
+            );
+          } else {
+            return Center(child: Text('No data available'));
+          }
+        },
       ),
     );
   }
 
-  void _submitForm() {
-    // Implement form submission logic here
-    String judul = _judulController.text.trim();
-    String deskripsi = _deskripsiController.text.trim();
-    String tanggal = _dateController.text.trim();
-    String alamat = _alamatController.text.trim();
-    // Perform validation and submission
-    // Example validation: Ensure all fields are filled
-    if (judul.isEmpty || deskripsi.isEmpty || tanggal.isEmpty || alamat.isEmpty) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Error'),
-          content: Text('Please fill in all fields.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
-      return;
+  String getJenisText(String jenis) {
+    switch (jenis) {
+      case '1':
+        return 'Fasilitas Umum';
+      case '2':
+        return 'Pelayanan Publik';
+      case '3':
+        return 'Pelayanan Kesehatan';
+      case '4':
+        return 'Pelayanan Kebersihan';
+      default:
+        return 'Tidak diketahui';
     }
-    // Once validated, proceed with submission
-    // Here you can send the data to your backend or perform any required actions
+  }
+
+  String getStatusText(String status) {
+    switch (status) {
+      case '1':
+        return 'Belum Ditanggapi';
+      case '2':
+        return 'Diproses';
+      case '3':
+        return 'Selesai';
+      default:
+        return 'Tidak diketahui';
+    }
   }
 }
+
+

@@ -17,12 +17,17 @@ class AppDrawer extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.blue,
             ),
-            child: Text(
-              'LaporYuk!',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-              ),
+            child: Column(
+              children: [
+                Text(
+                  'LaporYuk!',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                  ),
+                ),
+                
+              ],
             ),
           ),
           ListTile(
@@ -54,7 +59,7 @@ class AppDrawer extends StatelessWidget {
               Navigator.pop(context); // Close the drawer
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Akun()),
+                MaterialPageRoute(builder: (context) => Akun(userId: 1,)),
               );
             },
           ),
