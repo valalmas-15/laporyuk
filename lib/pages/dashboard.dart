@@ -53,7 +53,7 @@ class _DashboardState extends State<Dashboard> {
 
   Future<List<Map<String, dynamic>>> fetchRiwayatLaporan() async {
     final Uri url = Uri.parse(
-        ApiUrl.baseUrl + 'Dashboardlaporan.php');
+        ApiUrl.apiUrl + 'Dashboardlaporan.php');
 
     try {
       final response = await http.get(url);

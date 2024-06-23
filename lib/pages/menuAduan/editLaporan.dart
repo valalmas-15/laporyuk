@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:laporyuk/component/datePicker.dart';
 import 'package:laporyuk/component/imgPicker.dart';
 import 'package:laporyuk/component/url.dart';
@@ -21,26 +22,25 @@ class _EditLaporanState extends State<EditLaporan> {
   TextEditingController _alamatController = TextEditingController();
   TextEditingController _dateController = TextEditingController();
   File? _pickedImage;
-  List<String> _dropdownItemsKecamatan = [
-    'Layanan Medis 1',
-    'Layanan Medis 2',
-    'Layanan Medis 3'
-  ];
-  String? _selectedDropdownItem;
-  List<String> _dropdownItemsJenis = [
-    '1',
-    '2',
-    '3'
+  String? _selectedKecamatan;
+  List<String> _kecamatanList = [];
+  String? _selectedJenis;
+  List<String> _jenisList = [
+    'Fasilitas Umum',
+    'Pelayanan Publik',
+    'Pelayanan Kesehatan',
+    'Pelayanan Kebersihan'
   ];
 
   @override
   void initState() {
     super.initState();
     _fetchLaporanData();
+    _fetchKecamatanData();
   }
 
   Future<void> _fetchLaporanData() async {
-    final apiUrl = ApiUrl.baseUrl+'detail_laporan.php?id=${widget.idAduan}'; // Ganti dengan URL API Anda
+    final apiUrl = ApiUrl.apiUrl + 'detail_laporan.php?id=${widget.idAduan}';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -51,27 +51,53 @@ class _EditLaporanState extends State<EditLaporan> {
           _judulController.text = data['judul'] ?? '';
           _deskripsiController.text = data['deskripsi'] ?? '';
           _alamatController.text = data['alamat'] ?? '';
-          _dateController.text = data['tanggal'] ?? ''; // Sesuaikan dengan nama field tanggal dari API
-          _selectedDropdownItem = data['kecamatan'] ?? null; // Sesuaikan dengan nama field kecamatan dari API
+          _dateController.text = data['tanggal'] ?? '';
+          _selectedKecamatan = data['kecamatan'] ?? null;
+          _selectedJenis = data['jenis'] ?? null;
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal memuat data laporan')),
+          SnackBar(content: Text('Failed to load laporan data')),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Terjadi kesalahan: $e')),
+        SnackBar(content: Text('Error occurred: $e')),
       );
     }
   }
+
+  Future<void> _fetchKecamatanData() async {
+    final apiUrl = ApiUrl.apiUrl + 'kecamatan.php';
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        setState(() {
+          _kecamatanList =
+              data.map((item) => item['nama_kecamatan'].toString()).toList();
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load kecamatan data')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error occurred: $e')),
+      );
+    }
+  }
+  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Edit Laporan'),
+        title: Text('Edit Laporan'),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -89,7 +115,7 @@ class _EditLaporanState extends State<EditLaporan> {
                       child: TextFormField(
                         controller: _judulController,
                         decoration: InputDecoration(
-                          labelText: 'Judul Laporan',
+                          labelText: ,
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -124,8 +150,8 @@ class _EditLaporanState extends State<EditLaporan> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: DropdownButtonFormField<String>(
-                        value: _selectedDropdownItem,
-                        items: _dropdownItemsKecamatan.map((String value) {
+                        value: _selectedKecamatan,
+                        items: _kecamatanList.map((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(value),
@@ -133,7 +159,7 @@ class _EditLaporanState extends State<EditLaporan> {
                         }).toList(),
                         onChanged: (String? value) {
                           setState(() {
-                            _selectedDropdownItem = value;
+                            _selectedKecamatan = value;
                           });
                         },
                         decoration: InputDecoration(
@@ -157,8 +183,8 @@ class _EditLaporanState extends State<EditLaporan> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: DropdownButtonFormField<String>(
-                        value: _selectedDropdownItem,
-                        items: _dropdownItemsJenis.map((String value) {
+                        value: _selectedJenis,
+                        items: _jenisList.map((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(value),
@@ -166,7 +192,7 @@ class _EditLaporanState extends State<EditLaporan> {
                         }).toList(),
                         onChanged: (String? value) {
                           setState(() {
-                            _selectedDropdownItem = value;
+                            _selectedJenis = value;
                           });
                         },
                         decoration: InputDecoration(
@@ -179,7 +205,6 @@ class _EditLaporanState extends State<EditLaporan> {
                       padding: const EdgeInsets.all(8.0),
                       child: ElevatedButton(
                         onPressed: () {
-                          // Handle submit logic here
                           _submitForm();
                         },
                         child: Text('Update Laporan'),
@@ -195,17 +220,78 @@ class _EditLaporanState extends State<EditLaporan> {
     );
   }
 
-  void _submitForm() {
-    // Implement logic to submit the form data
-    // Here you can use _judulController.text, _deskripsiController.text, _alamatController.text,
-    // _selectedDropdownItem, _pickedImage, etc.
+  void _submitForm() async {
+    final kecamatanMap = {
+      'Berbah': '1',
+      'Cangkringan': '2',
+      'Depok': '3',
+      'Gamping': '4',
+      'Godean': '5',
+      'Kalasan': '6',
+      'Minggir': '7',
+      'Mlati': '8',
+      'Moyudan': '9',
+      'Ngaglik': '10',
+      'Ngemplak': '11',
+      'Pakem': '12',
+      'Prambanan': '13',
+      'Seyegan': '14',
+      'Sleman': '15',
+      'Tempel': '16',
+      'Turi': '17'
+    };
+
+    final jenisMap = {
+      'Fasilitas Umum': '1',
+      'Pelayanan Publik': '2',
+      'Pelayanan Kesehatan': '3',
+      'Pelayanan Kebersihan': '4'
+    };
+
+    final idKecamatan = kecamatanMap[_selectedKecamatan] ?? '';
+    final idJenis = jenisMap[_selectedJenis] ?? '';
+
+    // Log the selected values
     print('Judul Laporan: ${_judulController.text}');
     print('Deskripsi Laporan: ${_deskripsiController.text}');
     print('Alamat Lengkap Kejadian: ${_alamatController.text}');
-    print('Status: $_selectedDropdownItem');
+    print('ID Kecamatan: $idKecamatan');
+    print('Jenis Laporan: $idJenis');
     if (_pickedImage != null) {
       print('Bukti Laporan: ${_pickedImage!.path}');
     }
-    // Add your submission logic here
+
+    // Prepare data to be sent
+    final data = {
+      'judul': _judulController.text,
+      'deskripsi': _deskripsiController.text,
+      'alamat': _alamatController.text,
+      'id_kecamatan': idKecamatan,
+      'id_jenis': idJenis,
+      'tanggal': _dateController.text,
+      'image': _pickedImage != null
+          ? base64Encode(_pickedImage!.readAsBytesSync())
+          : '',
+    };
+
+    // Send data to API
+    final apiUrl =
+        '${ApiUrl.apiUrl}update_laporan.php'; // Replace with your update API URL
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        body: jsonEncode(data),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      final message = response.statusCode == 200
+          ? 'Laporan berhasil diperbarui'
+          : 'Gagal memperbarui laporan';
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Terjadi kesalahan: $e')));
+    }
   }
 }

@@ -23,7 +23,7 @@ class _RiwayatLaporanState extends State<RiwayatLaporan> {
 
   Future<List<Map<String, dynamic>>> fetchRiwayatLaporan() async {
     final response = await http.get(
-      Uri.parse(ApiUrl.baseUrl+'riwayat_laporan.php'),
+      Uri.parse(ApiUrl.apiUrl+'riwayat_laporan.php'),
     );
     if (response.statusCode == 200) {
       // Jika request sukses, parse JSON response

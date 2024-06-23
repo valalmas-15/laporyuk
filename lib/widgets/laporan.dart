@@ -104,9 +104,9 @@ Widget build(BuildContext context) {
   Color getStatusColor(String status) {
     switch (status) {
       case 'Belum Ditanggapi':
-        return Colors.grey;
+        return Colors.red;
       case 'Diproses':
-        return Colors.blue;
+        return Colors.grey;
       case 'Selesai':
         return Colors.green;
       default:

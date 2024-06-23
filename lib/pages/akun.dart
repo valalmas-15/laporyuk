@@ -30,7 +30,7 @@ class _AkunState extends State<Akun> {
 
   Future<Map<String, dynamic>> fetchUserData(int userId) async {
     final response = await http.get(
-      Uri.parse(ApiUrl.baseUrl + 'get_user_data.php?id=$userId'),
+      Uri.parse(ApiUrl.apiUrl + 'get_user_data.php?id=$userId'),
     );
 
     if (response.statusCode == 200) {
@@ -42,7 +42,7 @@ class _AkunState extends State<Akun> {
   }
 
   Future<void> _updateAccount() async {
-    final String apiUrl = ApiUrl.baseUrl + 'update_akun.php';
+    final String apiUrl = ApiUrl.apiUrl + 'update_akun.php';
 
     try {
       final Map<String, String> updatedData = {
