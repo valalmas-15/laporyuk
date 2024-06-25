@@ -1,33 +1,100 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:laporyuk/component/url.dart';
 
-class HeadlinePage extends StatelessWidget {
+class HeadlinePage extends StatefulWidget {
+  final String idBerita;
+
+  const HeadlinePage({Key? key, required this.idBerita}) : super(key: key);
+
+  @override
+  _HeadlinePageState createState() => _HeadlinePageState();
+}
+
+class _HeadlinePageState extends State<HeadlinePage> {
+  late String imageUrl;
+  late String title;
+  late String description;
+  bool isLoading = true; // State untuk menandai status loading
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    final Uri url = Uri.parse(ApiUrl.apiUrl + 'mobileheadline/berita_detail/${widget.idBerita}');
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> data = jsonDecode(response.body);
+
+        setState(() {
+          imageUrl = data['data']['foto_berita'] != null && data['data']['foto_berita'].isNotEmpty
+              ? ApiUrl.assetsUrl + 'laporan/' + data['data']['foto_berita']
+              : ApiUrl.assetsUrl + 'laporan/default-image.jpg'; // Ganti dengan URL default jika foto tidak tersedia
+          title = data['data']['judul_berita'] ?? 'No Title'; // Menambahkan default jika title kosong
+          description = data['data']['deskripsi_berita'] ?? 'No Description'; // Menambahkan default jika deskripsi kosong
+          isLoading = false; // Set loading menjadi false setelah data berhasil diambil
+        });
+      } else {
+        print('Failed to load data. Error: ${response.statusCode}');
+        setState(() {
+          isLoading = false; // Set loading menjadi false dalam kasus error juga
+        });
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+      setState(() {
+        isLoading = false; // Set loading menjadi false dalam kasus error
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
-      children: [
-        SizedBox(
-          height: 50,
-        ),
-        Card(
-          child: Column(
-            children: [
-        Text('Headline', style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600, ),),
-              Image.network(
-                  'https://miro.medium.com/v2/resize:fit:828/format:webp/1*vgN2zojqiIYu23JPVuaSiA.jpeg'),
-            ],
-          ),
-        ),
-        // text deskripsi headline
-        Container(
-            color: Color.fromARGB(255, 255, 255, 255),
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque vel urna ut libero lacinia auctor. Phasellus auctor, arcu nec fringilla volutpat, erat purus vehicula justo, nec feugiat tortor arcu nec nunc. Integer efficitur leo et sem consequat, sit amet egestas eros facilisis. Sed a felis vitae erat varius vestibulum. Nam euismod augue et sem tincidunt, id cursus lectus pharetra. Nullam consequat diam vitae ligula fermentum, a dictum magna vulputate. In hac habitasse platea dictumst. Ut volutpat bibendum diam, sit amet ullamcorper nulla viverra ac. Donec suscipit, magna sit amet scelerisque aliquet, turpis felis efficitur turpis, sed tristique elit leo sit amet risus. Praesent euismod turpis id magna tincidunt, in fringilla eros interdum. Nulla facilisi. Maecenas consequat, lacus ac consequat pharetra, nisl eros consectetur magna, in laoreet turpis neque eget lorem. Donec varius finibus augue vel fringilla.',
-              style: TextStyle(fontSize: 16),
-            ),
-          ),
-      ],
-    ));
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: isLoading ? Text('Loading...') : Text(title, style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+      ),
+      body: SingleChildScrollView(
+        child: isLoading
+            ? Center(child: CircularProgressIndicator()) // Tampilkan indikator loading jika isLoading true
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(height: 20),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Deskripsi berita
+                  Container(
+                    color: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal:  25.0, vertical: 20),
+                    child: Text(
+                      description,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
+      ),
+    );
   }
 }

@@ -27,10 +27,15 @@ class MenuAduan extends StatelessWidget {
             width: 60,
             decoration: BoxDecoration(
               color: Colors.white,
+              border: 
+                Border.all(
+                  color: Colors.blue,
+                  width: 1,
+                ),
               borderRadius: BorderRadius.circular(14),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withOpacity(0.2),
                   blurRadius: 20,
                   spreadRadius: 2,
                   offset: const Offset(0, 4),

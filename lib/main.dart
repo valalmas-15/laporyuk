@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:laporyuk/pages/dashboard.dart';
+import 'package:laporyuk/pages/headlinePage.dart';
+import 'package:laporyuk/pages/login.dart';
+import 'package:laporyuk/pages/register.dart';
 
 void main() {
   runApp(const MyApp());

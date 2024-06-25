@@ -6,11 +6,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:laporyuk/component/datePicker.dart';
 import 'package:laporyuk/component/imgPicker.dart';
 import 'package:laporyuk/component/url.dart';
+import 'package:laporyuk/pages/riwayatLaporan.dart';
 
 class EditLaporan extends StatefulWidget {
+  final Map<String, dynamic> detailLaporan;
   final int idAduan;
 
-  const EditLaporan({Key? key, required this.idAduan}) : super(key: key);
+  const EditLaporan({Key? key, required this.detailLaporan, required this.idAduan}) : super(key: key);
 
   @override
   _EditLaporanState createState() => _EditLaporanState();
@@ -31,77 +33,55 @@ class _EditLaporanState extends State<EditLaporan> {
     'Pelayanan Kesehatan',
     'Pelayanan Kebersihan'
   ];
+  String? idAduan;
   String? _judulAduan;
   String? _deskripsiAduan;
   String? _alamatAduan;
   String? _tanggal;
 
+  final Map<String, String> jenisMap = {
+    'Fasilitas Umum': '1',
+    'Pelayanan Publik': '2',
+    'Pelayanan Kesehatan': '3',
+    'Pelayanan Kebersihan': '4'
+  };
+
   @override
   void initState() {
     super.initState();
-    _fetchLaporanData();
+    idAduan = widget.idAduan.toString();
+    _initValues();
     _fetchKecamatanData();
   }
 
-  Future<void> _fetchLaporanData() async {
-  final apiUrl = ApiUrl.apiUrl + 'detail_laporan.php?id=${widget.idAduan}';
-
-  try {
-    final response = await http.get(Uri.parse(apiUrl));
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      setState(() {
-        _judulController.text = data['judul_aduan'] ?? '';
-        _deskripsiController.text = data['deskripsi_aduan'] ?? '';
-        _alamatController.text = data['alamat_aduan'] ?? '';
-        _dateController.text = data['tanggal'] ?? '';
-
-        // Initialize _selectedKecamatan and _selectedJenis with existing values
-        _selectedKecamatan = data['kecamatan'];
-        _selectedJenis = data['jenis_aduan'];
-
-        // If _selectedKecamatan is null or not found in _kecamatanList, default to the first item
-        if (_selectedKecamatan == null || !_kecamatanList.contains(_selectedKecamatan)) {
-          _selectedKecamatan = _kecamatanList.isNotEmpty ? _kecamatanList.first : null;
-        }
-
-        // If _selectedJenis is null or not found in _jenisList, default to the first item
-        if (_selectedJenis == null || !_jenisList.contains(_selectedJenis)) {
-          _selectedJenis = _jenisList.isNotEmpty ? _jenisList.first : null;
-        }
-
-        // Ensure these variables are also updated for displaying hints
-        _judulAduan = data['judul_aduan'];
-        _deskripsiAduan = data['deskripsi_aduan'];
-        _alamatAduan = data['alamat_aduan'];
-        _tanggal = data['tanggal'];
-      });
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load laporan data')),
-      );
-    }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error occurred: $e')),
-    );
+  void _initValues() {
+    _judulController.text = widget.detailLaporan['judul_aduan'] ?? '';
+    _deskripsiController.text = widget.detailLaporan['deskripsi_aduan'] ?? '';
+    _alamatController.text = widget.detailLaporan['alamat_aduan'] ?? '';
+    _dateController.text = widget.detailLaporan['tanggal'] ?? '';
+    _selectedKecamatan = widget.detailLaporan['nama_kecamatan'];
+    _selectedJenis = _getJenisFromValue(widget.detailLaporan['jenis_aduan']);
+    _judulAduan = widget.detailLaporan['judul_aduan'];
+    _deskripsiAduan = widget.detailLaporan['deskripsi_aduan'];
+    _alamatAduan = widget.detailLaporan['alamat_aduan'];
+    _tanggal = widget.detailLaporan['tanggal'];
   }
-}
 
-
+  String? _getJenisFromValue(String? value) {
+    return jenisMap.keys.firstWhere((k) => jenisMap[k] == value, orElse: () => "");
+  }
 
   Future<void> _fetchKecamatanData() async {
-    final apiUrl = ApiUrl.apiUrl + 'kecamatan.php';
-
+    final apiUrl = ApiUrl.apiUrl + 'mobilelaporan/get_kecamatan';
     try {
       final response = await http.get(Uri.parse(apiUrl));
-
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         setState(() {
-          _kecamatanList =
-              data.map((item) => item['nama_kecamatan'].toString()).toList();
+          _kecamatanList = data.map((item) => item['nama_kecamatan'].toString()).toList();
+          if (_selectedKecamatan != null && !_kecamatanList.contains(_selectedKecamatan)) {
+            _selectedKecamatan = _kecamatanList.isNotEmpty ? _kecamatanList.first : null;
+          }
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -117,6 +97,7 @@ class _EditLaporanState extends State<EditLaporan> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('Nilai selectedKecamatan saat build: $_selectedKecamatan');
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -172,7 +153,7 @@ class _EditLaporanState extends State<EditLaporan> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: DropdownButtonFormField<String>(
-                        value: _selectedKecamatan,
+                        value: _kecamatanList.contains(_selectedKecamatan) ? _selectedKecamatan : null,
                         items: _kecamatanList.map((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
@@ -190,7 +171,6 @@ class _EditLaporanState extends State<EditLaporan> {
                         ),
                       ),
                     ),
-                    
                     ImagePickerWidget(
                       onImageSelected: (File pickedImage) {
                         setState(() {
@@ -206,7 +186,7 @@ class _EditLaporanState extends State<EditLaporan> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: DropdownButtonFormField<String>(
-                        value: _selectedJenis,
+                        value: _jenisList.contains(_selectedJenis) ? _selectedJenis : null,
                         items: _jenisList.map((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
@@ -244,58 +224,23 @@ class _EditLaporanState extends State<EditLaporan> {
   }
 
   void _submitForm() async {
-    final kecamatanMap = {
-      'Berbah': '1',
-      'Cangkringan': '2',
-      'Depok': '3',
-      'Gamping': '4',
-      'Godean': '5',
-      'Kalasan': '6',
-      'Minggir': '7',
-      'Mlati': '8',
-      'Moyudan': '9',
-      'Ngaglik': '10',
-      'Ngemplak': '11',
-      'Pakem': '12',
-      'Prambanan': '13',
-      'Seyegan': '14',
-      'Sleman': '15',
-      'Tempel': '16',
-      'Turi': '17'
-    };
-
-    final jenisMap = {
-      'Fasilitas Umum': '1',
-      'Pelayanan Publik': '2',
-      'Pelayanan Kesehatan': '3',
-      'Pelayanan Kebersihan': '4'
-    };
-
-    final idKecamatan = kecamatanMap[_selectedKecamatan] ?? '';
+    final idKecamatan = _kecamatanList.indexOf(_selectedKecamatan!) + 1;
     final idJenis = jenisMap[_selectedJenis] ?? '';
 
-    print('Judul Laporan: ${_judulController.text}');
-    print('Deskripsi Laporan: ${_deskripsiController.text}');
-    print('Alamat Lengkap Kejadian: ${_alamatController.text}');
-    print('ID Kecamatan: $idKecamatan');
-    print('Jenis Laporan: $idJenis');
-    if (_pickedImage != null) {
-      print('Bukti Laporan: ${_pickedImage!.path}');
-    }
-
     final data = {
+      'idAduan': int.parse(idAduan!),
       'judul': _judulController.text,
       'deskripsi': _deskripsiController.text,
       'alamat': _alamatController.text,
       'id_kecamatan': idKecamatan,
-      'id_jenis': idJenis,
+      'jenis': idJenis,
       'tanggal': _dateController.text,
-      'image': _pickedImage != null
-          ? base64Encode(_pickedImage!.readAsBytesSync())
-          : '',
+      'image': _pickedImage != null ? base64Encode(_pickedImage!.readAsBytesSync()) : '',
     };
 
-    final apiUrl = '${ApiUrl.apiUrl}update_laporan.php';
+    print('Data yang dikirim: $data');
+
+    final apiUrl = '${ApiUrl.apiUrl}mobilelaporan/update_laporan/${data['idAduan']}';
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -303,14 +248,43 @@ class _EditLaporanState extends State<EditLaporan> {
         headers: {'Content-Type': 'application/json'},
       );
 
-      final message = response.statusCode == 200
-          ? 'Laporan berhasil diperbarui'
-          : 'Gagal memperbarui laporan';
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(message)));
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.body.trim() == 'NULL') {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Unexpected server response')));
+        return;
+      }
+
+      dynamic responseBody;
+      try {
+        responseBody = jsonDecode(response.body);
+      } catch (e) {
+        print('Error decoding response body: $e');
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Unexpected server response')));
+        return;
+      }
+
+      if (response.statusCode == 200) {
+        if (responseBody != null && responseBody['message'] != null) {
+          final message = responseBody['message'];
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => RiwayatLaporan()),
+          );
+        } else if (responseBody != null && responseBody['error'] != null) {
+          final errorMessage = responseBody['error'];
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMessage)));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Unknown response format')));
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update data')));
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Terjadi kesalahan: $e')));
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Terjadi kesalahan: $e')));
     }
   }
 }

@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:laporyuk/component/url.dart';
 import 'package:laporyuk/widgets/drawer.dart';
 import 'package:laporyuk/widgets/laporan.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RiwayatLaporan extends StatefulWidget {
   const RiwayatLaporan({Key? key}) : super(key: key);
@@ -14,6 +15,7 @@ class RiwayatLaporan extends StatefulWidget {
 
 class _RiwayatLaporanState extends State<RiwayatLaporan> {
   late Future<List<Map<String, dynamic>>> _futureRiwayatLaporan;
+  
 
   @override
   void initState() {
@@ -22,27 +24,38 @@ class _RiwayatLaporanState extends State<RiwayatLaporan> {
   }
 
   Future<List<Map<String, dynamic>>> fetchRiwayatLaporan() async {
-    final response = await http.get(
-      Uri.parse(ApiUrl.apiUrl+'riwayat_laporan.php'),
-    );
-    if (response.statusCode == 200) {
-      // Jika request sukses, parse JSON response
-      List<dynamic> data = jsonDecode(response.body);
-      // Konversi list dynamic menjadi list Map<String, dynamic>
-      List<Map<String, dynamic>> riwayatLaporan = data.map((e) {
-        return {
-          'id': e['idAduan'],
-          'judul': e['judul_aduan'],
-          'jenis': e['jenis_aduan'],
-          'tanggal': e['tanggal'],
-          'status': e['status_aduan'],
-        };
-      }).toList();
-      return riwayatLaporan;
-    } else {
-      throw Exception('Failed to load riwayat laporan');
-    }
+  final prefs = await SharedPreferences.getInstance();
+  final idUser = prefs.getString('idUser');
+
+  if (idUser == null || idUser.isEmpty) {
+    throw Exception('idUser is null or empty');
   }
+
+  final response = await http.get(
+    Uri.parse(ApiUrl.apiUrl + 'mobilelaporan/riwayat_laporan/'+idUser),
+    // headers: {'idUser': idUser},
+  );
+
+  if (response.statusCode == 200) {
+    // Jika request sukses, parse JSON response
+    List<dynamic> data = jsonDecode(response.body);
+    // Konversi list dynamic menjadi list Map<String, dynamic>
+    List<Map<String, dynamic>> riwayatLaporan = data.map((e) {
+      return {
+        'id': e['idAduan'],
+        'judul': e['judul_aduan'],
+        'jenis': e['jenis_aduan'],
+        'tanggal': e['tanggal'],
+        'status': e['status_aduan'],
+      };
+    }).toList();
+    return riwayatLaporan;
+  } else {
+    throw Exception('Failed to load riwayat laporan');
+  }
+}
+
+
 
   @override
   Widget build(BuildContext context) {

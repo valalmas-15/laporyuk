@@ -4,18 +4,20 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'package:laporyuk/component/headlines.dart';
 import 'package:laporyuk/component/url.dart';
 import 'package:laporyuk/pages/emergency.dart';
+import 'package:laporyuk/pages/headlinePage.dart';
+import 'package:laporyuk/pages/login.dart';
 import 'package:laporyuk/pages/menuAduan/fasilitasUmum.dart';
 import 'package:laporyuk/pages/menuAduan/pelayananKebersihan.dart';
 import 'package:laporyuk/pages/menuAduan/pelayananKesehatan.dart';
 import 'package:laporyuk/pages/menuAduan/pelayananPublik.dart';
+import 'package:laporyuk/theme.dart';
 import 'package:laporyuk/widgets/drawer.dart';
 import 'package:laporyuk/widgets/laporan.dart';
 import 'package:laporyuk/widgets/menu_aduan.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Dashboard extends StatefulWidget {
   Dashboard({Key? key}) : super(key: key);
@@ -25,60 +27,87 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  final List<Widget> headlineSliders = [
-    Headline(
-      imageUrl:
-          'https://miro.medium.com/v2/resize:fit:828/format:webp/1*vgN2zojqiIYu23JPVuaSiA.jpeg',
-      title: 'Headline',
-    ),
-    Headline(
-      imageUrl:
-          'https://miro.medium.com/v2/resize:fit:828/format:webp/1*vgN2zojqiIYu23JPVuaSiA.jpeg',
-      title: 'Headline',
-    ),
-    Headline(
-      imageUrl:
-          'https://miro.medium.com/v2/resize:fit:828/format:webp/1*vgN2zojqiIYu23JPVuaSiA.jpeg',
-      title: 'Headline',
-    ),
-  ];
+  late List<Map<String, dynamic>> headlineSliders = [];
 
   late Future<List<Map<String, dynamic>>> riwayatLaporan;
 
   @override
   void initState() {
     super.initState();
-    riwayatLaporan = fetchRiwayatLaporan();
+    riwayatLaporan = fetchDashboardLaporan();
+    fetchData();
+    _checkLoginStatus();
   }
 
-  Future<List<Map<String, dynamic>>> fetchRiwayatLaporan() async {
-    final Uri url = Uri.parse(
-        ApiUrl.apiUrl + 'Dashboardlaporan.php');
+  void _checkLoginStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final idUser = prefs.getString('idUser');
+    // Misalnya, cek apakah idUser (atau data session lainnya) sudah ada
+    if (idUser == null) {
+      // Jika tidak ada session, arahkan ke halaman login
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => Login()),
+      );
+    }
+    // Jika session ada, lanjutkan ke halaman dashboard
+    // Anda bisa tambahkan logika atau pengambilan data dashboard di sini
+  }
 
+  Future<void> fetchData() async {
     try {
+      final Uri url =
+          Uri.parse(ApiUrl.apiUrl + 'mobilelaporan/dashboard_berita');
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
         List<dynamic> data = jsonDecode(response.body);
-        List<Map<String, dynamic>> riwayatLaporan = data
-            .map((e) {
-              return {
-                'id': e['idAduan'],
-                'judul': e['judul_aduan'],
-                'jenis': e['jenis_aduan'],
-                'tanggal': e['tanggal'],
-                'status': e['status_aduan'],
-              };
-            })
-            .toList();
+        setState(() {
+          headlineSliders = data.map((item) {
+            String imageUrl =
+                item['foto_berita'] != null && item['foto_berita'].isNotEmpty
+                    ? ApiUrl.assetsUrl + 'laporan/${item['foto_berita']}'
+                    : ApiUrl.assetsUrl + 'laporan/600x400.png';
 
-        return riwayatLaporan;
+            return {
+              'imageUrl': imageUrl,
+              'title': item['judul_berita'],
+              'idBerita': item['idBerita'],
+            };
+          }).toList();
+        });
       } else {
-        throw Exception('Failed to load riwayat laporan: ${response.statusCode}');
+        print('Failed to load data. Error: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching riwayat laporan: $e');
-      throw Exception('Error: $e');
+      print('Error occurred: $e');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchDashboardLaporan() async {
+    final prefs = await SharedPreferences.getInstance();
+    final idUser = prefs.getString('idUser');
+
+    if (idUser == null || idUser.isEmpty) {
+      throw Exception('idUser is null or empty');
+    }
+    final response = await http.get(
+      Uri.parse(
+          ApiUrl.apiUrl + 'Mobilelaporan/dashboard_laporan?idUser=$idUser'),
+    );
+    if (response.statusCode == 200) {
+      List<dynamic> data = jsonDecode(response.body);
+      List<Map<String, dynamic>> dashboardLaporan = data.map((e) {
+        return {
+          'id': e['idAduan'],
+          'judul': e['judul_aduan'],
+          'jenis': e['jenis_aduan'],
+          'tanggal': e['tanggal'],
+          'status': e['status_aduan'],
+        };
+      }).toList();
+      return dashboardLaporan;
+    } else {
+      throw Exception('Failed to load dashboard laporan');
     }
   }
 
@@ -106,30 +135,63 @@ class _DashboardState extends State<Dashboard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 CarouselSlider(
-                  items: headlineSliders
-                      .map((item) => Container(
-                            width: MediaQuery.of(context).size.width,
-                            margin: EdgeInsets.symmetric(horizontal: 5.0),
-                            child: Card(
-                              color: Colors.blue,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: ClipRRect(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10.0)),
-                                child: item,
+                  items: headlineSliders.map((item) {
+                    return GestureDetector(
+                      onTap: () {
+                        // Navigasi ke halaman headline detail saat headline ditekan
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => HeadlinePage(
+                              idBerita: item['idBerita'],
+                            ),
+                          ),
+                        );
+                      },
+                      child: Card(
+                        color: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: const BorderSide(
+                            color: Colors.blue,
+                            width: 2,
+                          ),
+                        ),
+                        child: Column(
+                          children: <Widget>[
+                            SizedBox(height: 5,),
+                            Text(
+                              item['title'],
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                          ))
-                      .toList(),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: 
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.network(
+                                    item['imageUrl'],
+                                    width: 350,
+                                    height:
+                                        150, // Set a fixed height for the image to avoid overflow
+                                    fit: BoxFit
+                                        .cover, // Use BoxFit.cover to clip and scale the image
+                                  ),
+                                ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
                   options: CarouselOptions(
-                    height: 180,
-                    aspectRatio: MediaQuery.of(context).size.width /
-                        180, // Menyesuaikan aspect ratio agar lebar penuh
-                    viewportFraction:
-                        1.0, // Mengatur agar item memenuhi viewport
+                    height: 200,
+                    aspectRatio: MediaQuery.of(context).size.width / 180,
+                    viewportFraction: 1.0,
                     initialPage: 0,
                     enableInfiniteScroll: true,
                     reverse: false,
@@ -148,11 +210,12 @@ class _DashboardState extends State<Dashboard> {
                 Text(
                   'Menu Aduan',
                   style: GoogleFonts.poppins(
-                    color: Colors.white,
+                    color: textColor3,
                     fontSize: 25,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
+                const SizedBox(height: 16),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Row(
@@ -215,7 +278,7 @@ class _DashboardState extends State<Dashboard> {
                 ),
                 const SizedBox(height: 16),
                 Container(
-                  height: 360, // Adjust this height as needed
+                  height: 340, // Adjust this height as needed
                   child: Card(
                     color: Colors.white, // Set the background color of the Card
                     margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -251,10 +314,8 @@ class _DashboardState extends State<Dashboard> {
                                       return LaporanCard(
                                         id: int.parse(
                                             snapshot.data![index]['id']),
-                                        judul: snapshot.data![index]
-                                            ['judul']!,
-                                        jenis: snapshot.data![index]
-                                            ['jenis']!,
+                                        judul: snapshot.data![index]['judul']!,
+                                        jenis: snapshot.data![index]['jenis']!,
                                         tanggal: snapshot.data![index]
                                             ['tanggal']!,
                                         status: snapshot.data![index]
