@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:laporyuk/component/url.dart';
-import 'package:laporyuk/pages/menuAduan/editLaporan.dart';
+import 'package:laporyuk/pages/editLaporan.dart';
 
 class DetailLaporan extends StatefulWidget {
   final int idAduan;
@@ -37,7 +37,9 @@ class _DetailLaporanState extends State<DetailLaporan> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: Text('Detail Laporan'),
       ),
       body: FutureBuilder<Map<String, dynamic>>(
@@ -57,8 +59,8 @@ class _DetailLaporanState extends State<DetailLaporan> {
           // Tentukan URL gambar untuk ditampilkan atau gunakan gambar default jika tidak ada
           String imageUrl = detailLaporan['foto_aduan'] != null &&
                   detailLaporan['foto_aduan'].isNotEmpty
-              ? '${ApiUrl.baseUrl}assets/berita/${detailLaporan['foto_aduan']}'
-              : '${ApiUrl.baseUrl}assets/berita/600x400.png';
+              ? '${ApiUrl.baseUrl}assets/laporan/${detailLaporan['foto_aduan']}'
+              : '${ApiUrl.baseUrl}assets/laporan/600x400.png';
 
             return SingleChildScrollView(
             child: Padding(
@@ -100,7 +102,7 @@ class _DetailLaporanState extends State<DetailLaporan> {
                     ),
                     SizedBox(height: 8),
                     Text(
-                    'Jenis: ${getJenisText(detailLaporan['jenis_aduan'])}',
+                    'Jenis: Keluhan ${getJenisText(detailLaporan['jenis_aduan'])}',
                     style: TextStyle(fontSize: 16),
                     ),
                     SizedBox(height: 8),
@@ -128,8 +130,6 @@ class _DetailLaporanState extends State<DetailLaporan> {
                         MaterialPageRoute(
                           builder: (context) => EditLaporan(
                           detailLaporan: detailLaporan,
-                          idAduan: widget
-                            .idAduan, // Menambahkan idAduan ke halaman EditLaporan
                           ),
                         ),
                         );

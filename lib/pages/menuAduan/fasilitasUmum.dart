@@ -78,7 +78,7 @@ class _FasilitasUmumState extends State<FasilitasUmum> {
                       child: TextFormField(
                         controller: _judulController,
                         decoration: InputDecoration(
-                          hintText: 'Judul Laporan',
+                          labelText: 'Judul Laporan',
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -89,7 +89,7 @@ class _FasilitasUmumState extends State<FasilitasUmum> {
                         controller: _deskripsiController,
                         maxLines: 3,
                         decoration: InputDecoration(
-                          hintText: 'Deskripsi Laporan',
+                          labelText: 'Deskripsi Laporan',
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -105,7 +105,7 @@ class _FasilitasUmumState extends State<FasilitasUmum> {
                       child: TextFormField(
                         controller: _alamatController,
                         decoration: InputDecoration(
-                          hintText: 'Alamat Kejadian',
+                          labelText: 'Alamat Kejadian',
                           border: OutlineInputBorder(),
                         ),
                       ),

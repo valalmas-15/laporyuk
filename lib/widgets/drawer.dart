@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:laporyuk/pages/login.dart';
 import 'package:laporyuk/pages/dashboard.dart';
@@ -14,12 +16,22 @@ class AppDrawer extends StatefulWidget {
 
 class _AppDrawerState extends State<AppDrawer> {
   late Future<Map<String, String?>> userData;
+  late String userId; // Added to store userId
 
   @override
   void initState() {
     super.initState();
     userData = getUserData();
+    getUserIdFromPreferences(); // Call to get userId on initState
   }
+
+  Future<void> getUserIdFromPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userId = prefs.getString('idUser')!; // Fetch userId from SharedPreferences
+    });
+  }
+
 
   Future<Map<String, String?>> getUserData() async {
     final prefs = await SharedPreferences.getInstance();
@@ -135,7 +147,7 @@ class _AppDrawerState extends State<AppDrawer> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => Akun(
-                    userId: 1, // Ganti dengan userId yang sesuai
+                    userId: userId, // Pass userId fetched from SharedPreferences
                   ),
                 ),
               );

@@ -7,7 +7,7 @@ import 'package:laporyuk/widgets/drawer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Akun extends StatefulWidget {
-  final int userId;
+  final String userId;
 
   Akun({Key? key, required this.userId}) : super(key: key);
 

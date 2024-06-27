@@ -14,56 +14,56 @@ class Login extends StatelessWidget {
   final numberController = TextEditingController();
 
   void login(BuildContext context) async {
-    final username = usernameController.text;
-    final number = numberController.text;
+  final username = usernameController.text;
+  final number = numberController.text;
 
-    final url =
-        ApiUrl.apiUrl + 'mobileuser/login'; // replace with your CI3 backend URL
+  final url = ApiUrl.apiUrl + 'mobileuser/login'; // replace with your CI3 backend URL
 
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, String>{
-          'Username': username,
-          'noHP': number,
-        }),
-      );
+  try {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'Username': username,
+        'noHP': number,
+      }),
+    );
 
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        if (responseData['status'] == 'success') {
-          // Handle successful login
-          print('Login successful');
-          // Save session information using SharedPreferences
-          final prefs = await SharedPreferences.getInstance();
-          prefs.setString('idUser', responseData['idUser']);
-          prefs.setString('Username', responseData['Username']);
-          prefs.setString('Nama', responseData['Nama']);
-          prefs.setString('noHP', responseData['noHP']);
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      if (responseData['status'] == 'success') {
+        // Handle successful login
+        print('Login successful');
+        // Save session information using SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        prefs.setString('idUser', responseData['idUser']); // Store as String
+        prefs.setString('Username', responseData['Username']);
+        prefs.setString('Nama', responseData['Nama']);
+        prefs.setString('noHP', responseData['noHP']);
 
-          // Navigate to Dashboard
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => Dashboard()),
-          );
-        } else {
-          // Handle login failure
-          print('Login failed: ${responseData['message']}');
-          // Show error message to the user if needed
-        }
+        // Navigate to Dashboard
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Dashboard()),
+        );
       } else {
-        print(
-            'Failed to login. Status code: ${response.statusCode}, Body: ${response.body}');
-        throw Exception('Failed to login');
+        // Handle login failure
+        print('Login failed: ${responseData['message']}');
+        // Show error message to the user if needed
       }
-    } catch (e) {
-      print('An error occurred: $e');
-      // Show error message to the user if needed
+    } else {
+      print(
+          'Failed to login. Status code: ${response.statusCode}, Body: ${response.body}');
+      throw Exception('Failed to login');
     }
+  } catch (e) {
+    print('An error occurred: $e');
+    // Show error message to the user if needed
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

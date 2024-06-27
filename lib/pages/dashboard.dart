@@ -12,6 +12,7 @@ import 'package:laporyuk/pages/menuAduan/fasilitasUmum.dart';
 import 'package:laporyuk/pages/menuAduan/pelayananKebersihan.dart';
 import 'package:laporyuk/pages/menuAduan/pelayananKesehatan.dart';
 import 'package:laporyuk/pages/menuAduan/pelayananPublik.dart';
+import 'package:laporyuk/pages/tambahLaporan.dart';
 import 'package:laporyuk/theme.dart';
 import 'package:laporyuk/widgets/drawer.dart';
 import 'package:laporyuk/widgets/laporan.dart';
@@ -226,7 +227,9 @@ class _DashboardState extends State<Dashboard> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => FasilitasUmum(),
+                              builder: (context) => TambahLaporanScreen(
+                                jenisLaporan: 1,
+                              ),
                             ),
                           );
                         },
@@ -239,7 +242,7 @@ class _DashboardState extends State<Dashboard> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => PelayananPublik(),
+                              builder: (context) => TambahLaporanScreen(jenisLaporan: 2,),
                             ),
                           );
                         },
@@ -252,7 +255,7 @@ class _DashboardState extends State<Dashboard> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => PelayananKesehatan(),
+                              builder: (context) => TambahLaporanScreen(jenisLaporan: 3,),
                             ),
                           );
                         },
@@ -265,7 +268,7 @@ class _DashboardState extends State<Dashboard> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => PelayananKebersihan(),
+                              builder: (context) => TambahLaporanScreen(jenisLaporan: 4,),
                             ),
                           );
                         },
