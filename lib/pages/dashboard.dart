@@ -389,13 +389,12 @@ class _DashboardState extends State<Dashboard> {
             ),
           ),
           Positioned(
-            left: 0,
-            right: 0,
+            left: MediaQuery.of(context).size.width / 2 - 45,
             bottom: 4,
             child: Opacity(
               opacity: 1,
               child: Container(
-                width: 100,
+                width: 90,
                 height: 90,
                 decoration: const BoxDecoration(
                   color: Colors.white,
@@ -405,22 +404,23 @@ class _DashboardState extends State<Dashboard> {
             ),
           ),
           Positioned(
-            left: 0,
-            right: 0,
+            left: MediaQuery.of(context).size.width / 2 - 40,
             bottom: 8,
             child: InkWell(
               onTap: () {
                 // Navigasi ke halaman SOS saat tombol ditekan
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => Emergency()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Emergency()),
+                );
               },
               child: Opacity(
                 opacity: 1,
                 child: Container(
                   width: 80,
                   height: 80,
-                  decoration: const BoxDecoration(
-                    color: Color.fromARGB(255, 255, 57, 57),
+                  decoration: BoxDecoration(
+                    color: Colors.red, // Change the color to red
                     shape: BoxShape.circle,
                   ),
                   child: const Center(

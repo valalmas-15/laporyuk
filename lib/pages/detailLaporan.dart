@@ -55,6 +55,7 @@ class _DetailLaporanState extends State<DetailLaporan> {
 
           Map<String, dynamic> detailLaporan = snapshot.data!;
           bool allowEdit = detailLaporan['status_aduan'] == '1';
+          bool solution = detailLaporan['status_aduan'] =='3';
 
           // Tentukan URL gambar untuk ditampilkan atau gunakan gambar default jika tidak ada
           String imageUrl = detailLaporan['foto_aduan'] != null &&
@@ -118,6 +119,12 @@ class _DetailLaporanState extends State<DetailLaporan> {
                     SizedBox(height: 8),
                     Text(
                     'Deskripsi: ${detailLaporan['deskripsi_aduan']}',
+                    style: TextStyle(fontSize: 16),
+                    ),
+                    SizedBox(height: 12),
+                    if(solution)
+                    Text(
+                    'Penanganan : ${detailLaporan['deskripsi_penanganan_aduan']}',
                     style: TextStyle(fontSize: 16),
                     ),
                     SizedBox(height: 16),

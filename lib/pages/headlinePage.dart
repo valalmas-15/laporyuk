@@ -16,6 +16,7 @@ class _HeadlinePageState extends State<HeadlinePage> {
   late String imageUrl;
   late String title;
   late String description;
+  late String date;
   bool isLoading = true; // State untuk menandai status loading
 
   @override
@@ -25,7 +26,8 @@ class _HeadlinePageState extends State<HeadlinePage> {
   }
 
   Future<void> fetchData() async {
-    final Uri url = Uri.parse(ApiUrl.apiUrl + 'mobileheadline/berita_detail/${widget.idBerita}');
+    final Uri url = Uri.parse(
+        ApiUrl.apiUrl + 'mobileheadline/berita_detail/${widget.idBerita}');
 
     try {
       final response = await http.get(url);
@@ -34,12 +36,19 @@ class _HeadlinePageState extends State<HeadlinePage> {
         Map<String, dynamic> data = jsonDecode(response.body);
 
         setState(() {
-          imageUrl = data['data']['foto_berita'] != null && data['data']['foto_berita'].isNotEmpty
+          imageUrl = data['data']['foto_berita'] != null &&
+                  data['data']['foto_berita'].isNotEmpty
               ? ApiUrl.assetsUrl + 'laporan/' + data['data']['foto_berita']
-              : ApiUrl.assetsUrl + 'laporan/default-image.jpg'; // Ganti dengan URL default jika foto tidak tersedia
-          title = data['data']['judul_berita'] ?? 'No Title'; // Menambahkan default jika title kosong
-          description = data['data']['deskripsi_berita'] ?? 'No Description'; // Menambahkan default jika deskripsi kosong
-          isLoading = false; // Set loading menjadi false setelah data berhasil diambil
+              : ApiUrl.assetsUrl +
+                  'laporan/default-image.jpg'; // Ganti dengan URL default jika foto tidak tersedia
+          title = data['data']['judul_berita'] ??
+              'No Title'; // Menambahkan default jika title kosong
+          description = data['data']['deskripsi_berita'] ??
+              'No Description'; // Menambahkan default jika deskripsi kosong
+          date = data['data']['tanggal_berita'] ??
+              'No Date'; // Menambahkan default jika tanggal kosong
+          isLoading =
+              false; // Set loading menjadi false setelah data berhasil diambil
         });
       } else {
         print('Failed to load data. Error: ${response.statusCode}');
@@ -60,13 +69,20 @@ class _HeadlinePageState extends State<HeadlinePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: isLoading ? Text('Loading...') : Text(title, style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),),
+        title: isLoading
+            ? Text('Loading...')
+            : Text(
+                title,
+                style: TextStyle(fontSize: 25, fontWeight: FontWeight.w600),
+              ),
         centerTitle: true,
         backgroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
         child: isLoading
-            ? Center(child: CircularProgressIndicator()) // Tampilkan indikator loading jika isLoading true
+            ? Center(
+                child:
+                    CircularProgressIndicator()) // Tampilkan indikator loading jika isLoading true
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -86,10 +102,23 @@ class _HeadlinePageState extends State<HeadlinePage> {
                   // Deskripsi berita
                   Container(
                     color: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal:  25.0, vertical: 20),
-                    child: Text(
-                      description,
-                      style: TextStyle(fontSize: 16),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 25.0, vertical: 20),
+                    child: Column(
+                      children: [Text(
+                          date,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          description,
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        
+                      ],
                     ),
                   ),
                 ],
