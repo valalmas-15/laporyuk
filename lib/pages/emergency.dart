@@ -4,18 +4,14 @@ class Emergency extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Emergency"),
-      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            InkWell(
+            SizedBox(height: 70,),
+           InkWell(
               onTap: () {},
-              child: Opacity(
-                opacity: 1,
-                child: Container(
+              child: Container(
                   width: 170,
                   height: 170,
                   decoration: BoxDecoration(
@@ -30,7 +26,6 @@ class Emergency extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
             ),
             SizedBox(height: 30),
             Text(
@@ -43,7 +38,7 @@ class Emergency extends StatelessWidget {
             ),
             SizedBox(height: 30),
             Text(
-              'Lokasi Anda Akan Diteruskan',
+              'Lokasi Terkini Anda Akan Diteruskan',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, 
               ),
             ),
