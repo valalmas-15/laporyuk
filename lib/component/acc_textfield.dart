@@ -1,40 +1,43 @@
 import 'package:flutter/material.dart';
 
 class AccTextField extends StatelessWidget {
-  final controller;
-  final String hintText;
+  final TextEditingController controller;
+  final String initialValue;
+  final String title;
 
-  const AccTextField({super.key, required this.controller, required this.hintText,});
+  const AccTextField({
+    Key? key,
+    required this.title,
+    required this.controller,
+    required this.initialValue,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
+    // Set initial value to the controller
+    controller.text = initialValue;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 15.0),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          hintText: hintText,
-          hintStyle: TextStyle(
-            color: Color.fromARGB(255, 91, 90, 90),
-            fontSize: 24,
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.w400,
-            height: 0,
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
           ),
-          filled: true, // Set filled to true
-          fillColor: Colors.white, // Set the background color
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.black,
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 20.0),
+            child: TextFormField(
+              controller: controller,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+              ),
             ),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Color(0xFFF8F8F8),
-            ),
-            borderRadius: BorderRadius.circular(20),
-          ),
-        ),
+          )
+        ],
       ),
     );
   }

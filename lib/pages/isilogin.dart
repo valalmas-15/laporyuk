@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:laporyuk/component/acc_textfield.dart';
+import 'package:laporyuk/component/loginReg/acc_textfield.dart';
 
 class isiLogin extends StatelessWidget {
   final usernameController = TextEditingController();

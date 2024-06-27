@@ -1,14 +1,58 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:laporyuk/component/acc_textfield.dart';
+import 'package:laporyuk/component/loginReg/acc_textfield.dart';
 import 'package:laporyuk/component/textbutton.dart';
+import 'package:laporyuk/component/url.dart';
 import 'package:laporyuk/pages/login.dart';
+import 'package:http/http.dart' as http;
 
 class Register extends StatelessWidget {
-  final nameController = TextEditingController();
-  final usernameController = TextEditingController();
-  final numberController = TextEditingController();
-  onPressed() {}
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController numberController = TextEditingController();
+
+  void register(BuildContext context) async {
+    final username = usernameController.text;
+    final number = numberController.text;
+    final name = nameController.text;
+
+    final url = ApiUrl.apiUrl + 'mobileuser/register'; // replace with your CI3 backend URL
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'Username': username,
+          'noHP': number,
+          'Nama': name,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        if (responseData['status'] == 'success') {
+          // Handle successful login
+          print('Login successful');
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Login()),
+          );
+        } else {
+          // Handle login failure
+          print('Login failed: ${responseData['message']}');
+        }
+      } else {
+        print('Failed to login. Status code: ${response.statusCode}, Body: ${response.body}');
+        throw Exception('Failed to login');
+      }
+    } catch (e) {
+      print('An error occurred: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,27 +134,26 @@ class Register extends StatelessWidget {
                 SizedBox(
                   height: screenHeight * 0.410,
                 ),
-                //Nama textfield
+                // Nama textfield
                 AccTextField(
                   controller: nameController,
                   hintText: 'Nama',
                 ),
-                //Username textfield
+                // Username textfield
                 AccTextField(
                   controller: usernameController,
                   hintText: 'Username',
                 ),
-
-                //Number textfield
+                // Number textfield
                 AccTextField(
                   controller: numberController,
                   hintText: 'Nomor HandPhone',
                 ),
-                //Login button
+                // Register button
                 TextButton(
                   onPressed: () {
-                      
-                    },
+                    register(context);
+                  },
                   child: Row(
                     children: [
                       Padding(
@@ -162,8 +205,10 @@ class Register extends StatelessWidget {
               ],
             ),
             Padding(
-                padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom))
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+            )
           ],
         ),
       ),

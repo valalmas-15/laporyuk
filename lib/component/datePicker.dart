@@ -20,16 +20,12 @@ class _DatePickerWidgetState extends State<DatePickerWidget> {
   child: Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(
-        'Tanggal:',
-        style: TextStyle(fontSize: 18.0),
-      ),
       SizedBox(height: 8.0), // Spasi antara Text dan TextFormField
       TextFormField(
         controller: widget.controller,
         readOnly: true,
         decoration: InputDecoration(
-          hintText: 'Pilih Tanggal',
+          hintText: 'Pilih Tanggal Kejadian',
           suffixIcon: Icon(Icons.calendar_today),
         ),
         onTap: () {

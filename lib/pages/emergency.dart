@@ -8,15 +8,10 @@ class Emergency extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: InkWell(
+            SizedBox(height: 70,),
+           InkWell(
               onTap: () {},
-              child: Opacity(
-                opacity: 1,
-                child: Container(
+              child: Container(
                   width: 170,
                   height: 170,
                   decoration: BoxDecoration(
@@ -31,14 +26,26 @@ class Emergency extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
             ),
-          ),
             SizedBox(height: 30),
             Text(
               'Tekan & Tahan Tombol Selama 2 Detik',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            )
+            ),
+            Text(
+              'Untuk Memanggil Bantuan',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 30),
+            Text(
+              'Lokasi Terkini Anda Akan Diteruskan',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, 
+              ),
+            ),
+            Text(
+              'Ke Instansi Terkait Terdekat',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
       ),

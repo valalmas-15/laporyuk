@@ -1,14 +1,69 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:laporyuk/component/acc_textfield.dart';
+import 'package:laporyuk/component/loginReg/acc_textfield.dart';
 import 'package:laporyuk/component/textbutton.dart';
+import 'package:laporyuk/component/url.dart';
 import 'package:laporyuk/pages/dashboard.dart';
 import 'package:laporyuk/pages/register.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatelessWidget {
   final usernameController = TextEditingController();
   final numberController = TextEditingController();
-  onPress() {}
+
+  void login(BuildContext context) async {
+  final username = usernameController.text;
+  final number = numberController.text;
+
+  final url = ApiUrl.apiUrl + 'mobileuser/login'; // replace with your CI3 backend URL
+
+  try {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'Username': username,
+        'noHP': number,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      if (responseData['status'] == 'success') {
+        // Handle successful login
+        print('Login successful');
+        // Save session information using SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        prefs.setString('idUser', responseData['idUser']); // Store as String
+        prefs.setString('Username', responseData['Username']);
+        prefs.setString('Nama', responseData['Nama']);
+        prefs.setString('noHP', responseData['noHP']);
+
+        // Navigate to Dashboard
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Dashboard()),
+        );
+      } else {
+        // Handle login failure
+        print('Login failed: ${responseData['message']}');
+        // Show error message to the user if needed
+      }
+    } else {
+      print(
+          'Failed to login. Status code: ${response.statusCode}, Body: ${response.body}');
+      throw Exception('Failed to login');
+    }
+  } catch (e) {
+    print('An error occurred: $e');
+    // Show error message to the user if needed
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -90,24 +145,21 @@ class Login extends StatelessWidget {
                 SizedBox(
                   height: screenHeight * 0.491,
                 ),
-                //Username textfield
+                // Username textfield
                 AccTextField(
                   controller: usernameController,
                   hintText: 'Username',
                 ),
 
-                //Number textfield
+                // Number textfield
                 AccTextField(
                   controller: numberController,
                   hintText: 'Nomor HandPhone',
                 ),
-                //Login button
+                // Login button
                 TextButton(
-                  onPressed: (){
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => Dashboard()),
-                      );
+                  onPressed: () {
+                    login(context);
                   },
                   child: Row(
                     children: [
